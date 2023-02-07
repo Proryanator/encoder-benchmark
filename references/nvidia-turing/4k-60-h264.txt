@@ -1,0 +1,158 @@
+Results from entire permutation:
+==================================================================================================================================================================
+[Resolution]	[FPS]	[Bitrate]	[Encode Time]	[VMAF Time]	[VMAF Score]	[Encoder Settings]
+3840x2160	60	10		18s		1m28s		76.68040	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	10		22s		1m28s		77.12575	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	10		23s		1m28s		75.60857	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	10		23s		1m28s		77.59946	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	10		24s		1m28s		72.22140	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	10		24s		1m28s		77.67113	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	10		30s		1m29s		72.37341	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	10		30s		1m29s		77.74998	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	10		32s		1m30s		75.76579	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	10		30s		1m29s		77.74480	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	10		!!! Overloaded !!!				-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	10		!!! Overloaded !!!				-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	10		!!! Overloaded !!!				-preset p7 -tune ull -profile:v high -rc cbr -cbr true
+3840x2160	60	15		23s		1m27s		83.70285	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	15		26s		1m27s		84.04021	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	15		26s		1m27s		82.89784	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	15		26s		1m27s		84.46037	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	15		27s		1m27s		79.77464	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	15		27s		1m27s		84.53457	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	15		30s		1m28s		79.90364	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	15		30s		1m28s		84.54087	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	15		32s		1m29s		82.87410	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	15		30s		1m28s		84.49250	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	15		!!! Overloaded !!!				-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	15		!!! Overloaded !!!				-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	15		!!! Overloaded !!!				-preset p7 -tune ull -profile:v high -rc cbr -cbr true
+3840x2160	60	20		23s		1m26s		87.77959	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	20		26s		1m29s		88.03502	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	20		26s		1m27s		87.16351	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	20		26s		1m26s		88.34522	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	20		27s		1m27s		84.60921	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	20		26s		1m26s		88.39782	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	20		30s		1m27s		84.66978	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	20		30s		1m27s		88.43704	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	20		32s		1m27s		87.11238	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	20		30s		1m29s		88.46435	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	20		!!! Overloaded !!!				-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	20		!!! Overloaded !!!				-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	20		!!! Overloaded !!!				-preset p7 -tune ull -profile:v high -rc cbr -cbr true
+3840x2160	60	25		23s		1m26s		90.09315	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	25		26s		1m26s		90.30676	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	25		26s		1m29s		89.69839	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	25		26s		1m26s		90.60007	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	25		26s		1m26s		87.49775	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	25		26s		1m26s		90.59245	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	25		30s		1m27s		87.54654	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	25		30s		1m26s		90.67023	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	25		32s		1m27s		89.56701	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	25		30s		1m26s		90.65359	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	25		!!! Overloaded !!!				-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	25		!!! Overloaded !!!				-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	25		!!! Overloaded !!!				-preset p7 -tune ull -profile:v high -rc cbr -cbr true
+3840x2160	60	30		23s		1m26s		91.81829	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	30		26s		1m26s		92.04691	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	30		26s		1m26s		91.43076	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	30		27s		1m26s		92.27461	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	30		27s		1m26s		89.51134	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	30		26s		1m26s		92.28146	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	30		30s		1m28s		89.55003	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	30		30s		1m26s		92.29030	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	30		32s		1m26s		91.26761	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	30		30s		1m26s		92.32927	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	30		!!! Overloaded !!!				-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	30		!!! Overloaded !!!				-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	30		!!! Overloaded !!!				-preset p7 -tune ull -profile:v high -rc cbr -cbr true
+3840x2160	60	35		23s		1m26s		93.13573	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	35		27s		1m26s		93.29479	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	35		26s		1m26s		92.68586	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	35		27s		1m26s		93.47095	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	35		27s		1m26s		91.12012	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	35		27s		1m26s		93.52312	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	35		30s		1m26s		91.13619	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	35		30s		1m26s		93.55276	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	35		32s		1m27s		92.51475	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	35		30s		1m27s		93.53512	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	35		!!! Overloaded !!!				-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	35		!!! Overloaded !!!				-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	35		!!! Overloaded !!!				-preset p7 -tune ull -profile:v high -rc cbr -cbr true
+3840x2160	60	40		23s		1m26s		93.97160	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	40		27s		1m26s		94.12282	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	40		27s		1m26s		93.52248	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	40		27s		1m26s		94.30790	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	40		27s		1m27s		92.10780	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	40		27s		1m26s		94.29990	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	40		30s		1m26s		92.16416	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	40		30s		1m26s		94.35481	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	40		32s		1m27s		93.40947	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	40		30s		1m26s		94.35061	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	40		!!! Overloaded !!!				-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	40		!!! Overloaded !!!				-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	40		!!! Overloaded !!!				-preset p7 -tune ull -profile:v high -rc cbr -cbr true
+3840x2160	60	45		23s		1m26s		94.68674	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	45		27s		1m26s		94.80742	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	45		27s		1m26s		94.28408	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	45		27s		1m26s		94.96565	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	45		27s		1m26s		92.99207	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	45		27s		1m26s		94.97440	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	45		30s		1m27s		93.06584	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	45		30s		1m27s		94.98957	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	45		32s		1m30s		94.08474	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	45		30s		1m27s		94.98637	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	45		!!! Overloaded !!!				-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	45		!!! Overloaded !!!				-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	45		!!! Overloaded !!!				-preset p7 -tune ull -profile:v high -rc cbr -cbr true
+3840x2160	60	50		23s		1m26s		95.23787	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	50		27s		1m26s		95.30165	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	50		27s		1m26s		94.80300	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	50		27s		1m26s		95.41363	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	50		27s		1m29s		93.70727	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	50		27s		1m26s		95.45330	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	50		30s		1m27s		93.78199	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	50		30s		1m27s		95.47023	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	50		32s		1m27s		94.61900	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	50		30s		1m26s		95.45727	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	50		!!! Overloaded !!!				-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+3840x2160	60	50		!!! Overloaded !!!				-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+3840x2160	60	50		!!! Overloaded !!!				-preset p7 -tune ull -profile:v high -rc cbr -cbr true
+==================================================================================================================================================================
+Benchmark runtime: 3h18m7s
+
+Encoder settings that produced identical scores:
+==================================================================================================================================================================
+Identical score: 76.680405
+	Encoded: [-preset p1 -tune hq -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p1 -tune ll -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p1 -tune ull -profile:v high -rc cbr -cbr true]
+
+
+Identical score: 77.12575
+	Encoded: [-preset p2 -tune hq -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p2 -tune ll -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p2 -tune ull -profile:v high -rc cbr -cbr true]
+
+
+Identical score: 77.599464
+	Encoded: [-preset p3 -tune ll -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p3 -tune ull -profile:v high -rc cbr -cbr true]
+
+
+Identical score: 77.671135
+	Encoded: [-preset p4 -tune ll -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p4 -tune ull -profile:v high -rc cbr -cbr true]
+
+
+Identical score: 77.749985
+	Encoded: [-preset p5 -tune ll -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p5 -tune ull -profile:v high -rc cbr -cbr true]
+
+
+Identical score: 77.744804
+	Encoded: [-preset p6 -tune ll -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p6 -tune ull -profile:v high -rc cbr -cbr true]
+
+
+==================================================================================================================================================================

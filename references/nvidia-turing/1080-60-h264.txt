@@ -1,0 +1,106 @@
+Results from entire permutation:
+==================================================================================================================================================================
+[Resolution]	[FPS]	[Bitrate]	[Encode Time]	[VMAF Time]	[VMAF Score]	[Encoder Settings]
+1920x1080	60	5		16s		27s		74.50902	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	5		16s		27s		75.34191	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	5		16s		26s		72.95963	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	5		16s		26s		75.88480	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	5		16s		26s		69.81652	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	5		16s		26s		76.10236	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	5		16s		26s		69.58448	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	5		16s		26s		75.95850	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	5		16s		27s		73.08858	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	5		15s		27s		75.94342	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	5		16s		27s		73.41910	-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	5		16s		26s		76.35578	-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	10		16s		26s		87.40918	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	10		15s		26s		87.76508	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	10		16s		26s		86.76790	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	10		16s		26s		88.10063	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	10		16s		26s		84.52326	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	10		16s		26s		88.20581	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	10		16s		26s		84.22622	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	10		15s		26s		88.14150	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	10		16s		27s		86.50469	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	10		15s		26s		88.17024	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	10		17s		27s		86.74608	-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	10		16s		25s		88.36306	-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	15		16s		25s		91.88810	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	15		16s		25s		92.09664	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	15		16s		26s		91.67593	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	15		16s		25s		92.31938	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	15		16s		25s		90.19402	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	15		16s		26s		92.39477	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	15		16s		26s		90.05708	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	15		16s		25s		92.38586	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	15		16s		26s		91.29316	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	15		16s		26s		92.37621	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	15		17s		26s		91.50388	-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	15		16s		25s		92.51978	-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	20		15s		25s		94.03944	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	20		15s		25s		94.21046	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	20		16s		25s		93.98454	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	20		16s		25s		94.35272	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	20		16s		25s		92.95072	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	20		15s		25s		94.41286	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	20		16s		25s		92.90145	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	20		16s		25s		94.42652	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	20		16s		25s		93.64183	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	20		15s		25s		94.46563	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	20		17s		25s		93.73206	-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	20		16s		25s		94.52225	-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	25		15s		25s		95.30466	-preset p1 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	25		16s		25s		95.42963	-preset p2 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	25		16s		25s		95.32159	-preset p3 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	25		16s		25s		95.57478	-preset p3 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	25		16s		25s		94.45645	-preset p4 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	25		15s		25s		95.58061	-preset p4 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	25		16s		25s		94.48894	-preset p5 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	25		15s		25s		95.59511	-preset p5 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	25		16s		25s		94.98222	-preset p6 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	25		15s		25s		95.62213	-preset p6 -tune ll -profile:v high -rc cbr -cbr true
+1920x1080	60	25		18s		26s		95.07385	-preset p7 -tune hq -profile:v high -rc cbr -cbr true
+1920x1080	60	25		16s		25s		95.67976	-preset p7 -tune ll -profile:v high -rc cbr -cbr true
+==================================================================================================================================================================
+Benchmark runtime: 48m43s
+
+Encoder settings that produced identical scores:
+==================================================================================================================================================================
+Identical score: 74.50902
+	Encoded: [-preset p1 -tune hq -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p1 -tune ll -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p1 -tune ull -profile:v high -rc cbr -cbr true]
+
+
+Identical score: 75.34191
+	Encoded: [-preset p2 -tune hq -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p2 -tune ll -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p2 -tune ull -profile:v high -rc cbr -cbr true]
+
+
+Identical score: 75.8848
+	Encoded: [-preset p3 -tune ll -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p3 -tune ull -profile:v high -rc cbr -cbr true]
+
+
+Identical score: 76.102356
+	Encoded: [-preset p4 -tune ll -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p4 -tune ull -profile:v high -rc cbr -cbr true]
+
+
+Identical score: 75.9585
+	Encoded: [-preset p5 -tune ll -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p5 -tune ull -profile:v high -rc cbr -cbr true]
+
+
+Identical score: 75.94342
+	Encoded: [-preset p6 -tune ll -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p6 -tune ull -profile:v high -rc cbr -cbr true]
+
+
+Identical score: 76.35578
+	Encoded: [-preset p7 -tune ll -profile:v high -rc cbr -cbr true]
+	Ignored: [-preset p7 -tune ull -profile:v high -rc cbr -cbr true]
+
+
+==================================================================================================================================================================

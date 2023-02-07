@@ -1,0 +1,17 @@
+[package]
+name = "encoder_benchmark_tool"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.0.32", features = ["derive"] }
+compound_duration = "1.2.0"
+crossbeam-channel = "0.5.6"
+ctrlc = "3.2.4"
+filetime = "0.2.19"
+indicatif = "0.17.2"
+itertools = "0.10.5"
+num_cpus = "1.15.0"
+regex = "1.7.0"
+rev_buf_reader = "0.3.0"
+stoppable_thread = "0.2.1"
