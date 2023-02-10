@@ -2,15 +2,15 @@
 
 A command-line tool wrapper around ffmpeg that provides:
 
-- reliable way to benchmark real-time video encoding capabilities of your hardware
-- determination of encoder-specific settings that your hardware can handle
-- optional accurate video encode quality scoring via <a href="https://github.com/Netflix/vmaf">vmaf</a>
-- no storage overhead during benchmarking due to some clever use of data streaming via TCP
-- bitrate increasing permutations to find minimum bitrate needed for visually lossless game streaming
+- a reliable and replicable way to benchmark real-time video encoding capabilities of your hardware
+- determination of encoder-specific settings that your hardware can handle that maximizes fps & quality
+- accurate video encode output quality scoring via <a href="https://github.com/Netflix/vmaf">vmaf</a>
+- fixed storage requirements during tool use due to some clever use of data streaming via local TCP
+- bitrate permutations to find minimum bitrate needed for visually lossless local game streaming
 - a clean report at the end of the permutation results to help guide hardware decisions & streaming guides
 
-```shell
-# sample output for encoding a 4K@60 input file
+```text
+# sample output for encoding a 4K@60 input file on a GTX 1660 Super
 [Permutation 2/21]
 [ETR: 9m20s]
 [Bitrate: 10Mb/s]
@@ -22,32 +22,52 @@ Running benchmark to test whether encoder can keep up with input...
   90%'ile:      94
 ```
 
-For a quick-start guide for common use-cases, see <b>Quick-Run Guide</b>.
+For a real-world example of hardware capabilities identified by this tool, or what bitrate to use in Moonlight when doing at home
+game streaming, see [Expected Performance](#expected-performance).
 
-For a quick reference of what to expect for your hardware, or what bitrate to configure in Moonlight when doing at home
-game streaming, see the <b>Expected Performance</b> section at the bottom of the readme.
+To get started, keep reading below.
 
 ---
 
+## Streaming Host & Client Software Suggestions
+
+The author suggests using the following tools:
+
+- *Moonlight* - an open-source game streaming client that provides insane low-latency streaming, with a very helpful stats overlay
+- *Sunshine*  - an open-source version of GeForce Experience with encoder setting customization
+
+They will be referenced throughout the README in various examples, and can be downloaded from <a href='https://moonlight-stream.org/'>here</a>.
 ## Minimum system specs suggested
 
-In addition to the mentioned specs below, you should _not_ have drive compression enabled for Windows on the drive you
-plan to store the files on. This can heavily limit sequential read speeds and affect the results of the tool.
+- <b>OS:</b> Windows (will support more OS's eventually)
+- <b>Processor:</b> CPU with at least 6 cores
+- <b>GPU:</b> Nvidia GPU w/ a hardware encoder, in the main x16 PCI slot of your PC (for max PCI bandwidth)
+- <b>Memory:</b> >= 8GB RAM (higher is always better)
+- <b>Storage Space:</b> 90GB minimum on the target SSD (all benchmark files take up about 90GB)
+- <b>Storage Type/Speed:</b> 
+    - if benchmarking <= 2k@60, any SATA SSD will work just fine
+    - if benchmarking >= 2k@120, you MUST use an m.2 nvme drive with speeds upwards of 1.1GB/s
+    (See below for sequential read speeds needed per resolution & fps)
 
+A nice cross-platform tool to test your SSD's sequential read speeds: <a href='https://www.jazzdiskbench.com/'>Jazz Disk Bench</a>
+
+Here's the sequential read speeds you'll need to benchmark specific resoultion & fps combos. If your SSD is not fast enough, your maximum fps scores will be lower due to i/o bottlenecking.
 ```text
-OS: Windows, Mac or Linux
-Processor: CPU with at least 6 cores
-GPU: GPU w/ hardware encoder, in the main x16 PCI slot of your PC (for max PCI bandwidth)
-Memory: >= 8GB RAM (higher is always better)
-Storage Space: 120GB minimum (all benchmark files take up about 120GB)
-Storage Type/Speed: 
-    -if benchmarking <= 1080@120, any SATA ssd will work
-    -if benchmarking >= 1080@120, you MUST use an nvme drive with > 1GB/s sequential read speeds
+(Target)   (Sequential Read in MB/s)
+720@60              85
+720@120             165
+1080@60             190
+1080@120            375
+2k@60               340
+2k@120              680
+4k@60               750
+4k@120              1100
 ```
 
-The more cores you have, the faster the quality scoring via vmaf will happen, and the faster the benchmarks will
-run overall. Plus, your encoder of choice might be limited based on your CPU itself.
+### Key things to keep in mind:
 
+- do make sure your SSD drive in Windows does _not_ have drive compression enabled. This can severely affect your sequential read speeds, which is very important for reading high resolution/fps input files
+- the tool does _not_ support multiple Nvidia GPU's in your system, so it's suggested to just have 1 in your system
 
 ---
 
@@ -68,49 +88,8 @@ version `5.*` of ffmpeg/ffprobe.
    10+</a>
 4) Download the built executable for your platform from the release section of this repo onto the SSD that you wish to
    run the benchmark on
-5) Download all the raw video source files onto the same SSD where the executable is (and in the same folder)
-   from <a href='https://www.dropbox.com/sh/x08pkk47lc1v5ex/AADGaoOjOcA0-uPo7I0NaxL-a?dl=0'>here</a>. If you only wish
-   to
-   benchmark one specific resolution, only download that file and make sure to specify it as noted in the **Run using
-   the executable** section below
-
-(Note: due to the tool sending encoded video over your local network to test quality, you will not need more storage
-space than just what is needed to hold the original source video files).
-
----
-
-## Running the tool
-
-Keep in mind, this tool is going to stress the encoder of your choice. It's highly recommended when running this tool
-to <i>not use your computer for any other tasks</i> as that can affect the results.
-
-i.e. if you're using your GPU for encoding, it's best to not have any programs open that could use your GPU.
-
-#### Run using executable
-
-For a complete list of all command line arguments, run:
-
-`./ebt -h`
-
-Typical usage would be:
-
-```shell
-# general example, note that executable name might be different
-./ebt -e <encoder_name> -b <target_bitrate> -s <input_file.y4m>
-
-# specific example, wanting to encode H264 using your Nvidia GPU at a 10Mb/s bitrate target
-./ebt -e h264_nvenc -b 10 -s 1080-60.y4m
-```
-
-#### Run using cargo
-
-(See **Contributing** section for version of Rust to install)
-
-`cargo run --release -- -e h264_nvenc -b 10 -s 1080-60.y4m`
-
-#### Stopping the benchmark
-
-Kill the benchmark by hitting `ctrl-c` in the terminal/console where the benchmark is running.
+5) Download the .zip of all the raw video source files from <a href='https://www.dropbox.com/sh/x08pkk47lc1v5ex/AADGaoOjOcA0-uPo7I0NaxL-a?dl=0'>here</a>
+6) Extract all the source files to the target SSD you wish to read the files form (same folder as the executable)
 
 ---
 
@@ -119,12 +98,10 @@ Kill the benchmark by hitting `ctrl-c` in the terminal/console where the benchma
 This tool can do a lot of things, however it's likely that your use case is very specific. Here are the typical use
 cases & commands that you'd use.
 
-**Note:** the input file that you provide is what determines the resolution you'll be benchmarking.
+### The Standard Benchmark: 720-4K/60-120fps encode benchmark
 
-### The Benchmark: Run Pre-Configured Encodes to Compare to Others
-
-This feature of the tool is likely going to be the most popular, as it's intended to compare different systems
-encoding performances in a standardized way.
+This feature of the tool is likely going to be the most popular, as it's intended to compare different system
+encoding performance in a standardized way.
 
 Note: you <i>must</i> download all the video source files to be able to run the standard benchmark. See the <b>
 Installation & Setup Requirements</b> section.
@@ -132,45 +109,33 @@ Installation & Setup Requirements</b> section.
 It does the following:
 
 - runs pre-configured encoder settings & bitrate values chosen by the author
-- runs benchmark on all supported resolutions, outputting fps results to the console & a `benchmark.log` file
+(these settings were determined to provide the highest possible fps, requiring a little more bitrate for quality)
+- runs benchmark on all supported resolutions and framerates, outputting fps results to the console & a log file
 
-Simple run the following (and choose your encoder):
+Simply run the following and choose your encoder:
 
-`./ebc -e h264_nvenc`
-
-If you so chose, you can also calculate the quality of the encode as well, although at the target configurations &
-bitrates you should expect a vmaf score of 95:
-
-`./ebc -e h264_nvenc -c`
+`./ebt -e h264_nvenc`
 
 You may want the benchmark to stop early if it can't encode at the file's target fps; if so, use the `-d` parameter to
 detect encoder overload and stop the benchmark:
 
-`./ebc -e h264_nvenc -d`
+`./ebt -e h264_nvenc -d`
 
 **Location of Encoder Setting Used**: to see the chosen encoder preset for this benchmark, see the respective encoder's
 implementation of `run_standard_only()` method, found in `src/permutations`. These tend to lean on the side of a lower
 preset to help keep fps statistics a bit higher (since you can always use more bitrate to improve quality).
 
 **Location of Bitrate Used:** you can also find the pre-configured bitrate value for that encoder within the encoder's
-implementation of `get_resolution_to_bitrate_map()`, found in `src/permutations`. These values are typically the
-bitrates for the 120fps findings.
+implementation of `get_resolution_to_bitrate_map()`, found in `src/permutations`.
 
-### Running benchmark over encoder settings
+### Identifying encoder settings that work best and produce visually lossless quality
 
-This will run through all permutations of encoder settings, for your given resolution input file, and produce fps
-statistics, at the default bitrate of 10Mb/s. This gives you a good idea of the performance you can expect for your
-encoder.
+Unlike the Standard Benchmark which will run _one permutation_ over every resolution & framerate combination supported, this mode will instead iterate over different encoder setting permutations for a fixed resolution & framerate.
 
-`./ebt -e h264_nvenc -s 4k-60.y4m`
+For the below example, we are wanting to run over all possible encoder settings, at 20Mb/s, for the h264_nvenc encoder, targeted at 4K@60, checking the encoded output's quality:
+`./ebt -e h264_nvenc -s 4k-60.y4m -b 20 -c`
 
-You may want to gather fps statistics at higher bitrates that you're more likely to stream at, since output bitrate can
-affect encoder performance. Do this by using the following:
-
-`./ebt -e h264_nvenc -s 4k-60.y4m -b 50`
-
-If you are curious on how _the minimum bitrate required_ can be identified, this tool can help you find that as well in
-the next section.
+We happen to know that 20Mb/s is _way too low_ of a bitrate for 4K@60, no matter your encoder settings. This tool also supports slowly increasing bitrate to help you find the _minimum bitrate needed_ to get visually lossless game streaming at a target resolution & framerate.
 
 ### Bitrate & encoder settings combinations to achieve visually lossless game streaming
 
@@ -179,11 +144,7 @@ this is pretty accurate for lower resolutions, however depending on your hardwar
 get away with less bitrate than it suggests.
 
 For example: Moonlight auto-selects `80Mb/s` for streaming 4K@60 game content. However from our testing, you really only
-need `45-50Mb/s` when encoding using H264_NVENC.
-
-To simply test what quality scores you can get at a given bitrate, use the following:
-
-`./ebt -e h264_nvenc -s 4k-60.y4m -c -b 10`
+need `50Mb/s` when encoding using H264_NVENC. (findings from this tool fall in-line with Youtube's own suggested bitrate for 4K@60).
 
 If you're not sure on what bitrate would achieve visually lossless quality, provide a starting bitrate & max bitrate to
 permute over (in 5Mb/s intervals). In the below example, every encoder setting will be tested at
@@ -192,21 +153,25 @@ permute over (in 5Mb/s intervals). In the below example, every encoder setting w
 `./ebt -e h264_nvenc -s 4k-60.y4m -c -b 10 -m 100`
 
 When the tool detects that you've hit a `95` vmaf score, it will stop permuting. In the above example, the tool would
-stop permuting once it gets to `50Mb/s` since we know that's the point where you get visually lossless 4K@60 with
+stop permuting once it gets to `50Mb/s` because we know that's the point where you get visually lossless 4K@60 with
 H264_NVENC, and any higher amount of bitrate does not significantly improve quality and can actually reduce encoder
 performance.
+
+### Stopping the tool
+
+Kill the tool at any time by hitting `ctrl-c` in the terminal/console where the tool is running.
+
+### Viewing all supported options
+
+For a complete list of all command line arguments and what they mean, run:
+
+`./ebt -h`
 
 ---
 
 ## Discussion
 
-### What this benchmark can provide for you
-
-1) Determine what resolution/fps your specific system can encode in real-time with less guess work
-2) Permute over configured encoder settings to identify what settings maximize encoder real-time average fps
-3) Make use of quality scores to determine encoder setting & bitrate combinations that provides visually lossless
-   quality
-4) Provide encoder settings in a copy-paste format, making it easy to apply them into OBS Studio/Sunshine
+A _lot_ of research has gone into the development of this tool, and some decisions were made along the way that might not be obvious to why some conclusions were drawn. See the various below sections for in-depth discussions around the tool.
 
 ### How to Interpret FPS Statistics
 
@@ -227,7 +192,7 @@ Each stat has specific things that it can tell you about what your system can do
 When choosing encoder permutation settings to use, you should look at all 3 datapoints before deciding what your system
 can handle.
 
-#### A Good Encoding Experience Example
+### A Good Encoding Experience Example
 
 Let's say you get the following fps stats:
 
@@ -245,7 +210,7 @@ will drop down to as low as `68fps`. If that fps variance is fine with you, you 
 to `90fps`. Just know that at heavier encode times or game content where there's more movement/variance, your encode fps
 will drop.
 
-#### A Bad Encoding Experience Example
+### A Bad Encoding Experience Example
 
 Let's say instead, you see the following stats:
 
@@ -264,23 +229,28 @@ a better experience.
 
 ### Real-time encoding terminology
 
-The benchmark is always checking whether your encoder, at a given resolution/bitrate/fps, can keep up with <i>at least
-the given fps</i>. By default however, the actual encoding speed may be much higher than the input file. This is to help
-cut down on runtime during benchmarking.
+Any computer can encode video input files; but some encode at much slower speeds than others. One computer might encode a 4K@60 video file at a rate of 2fps, which is not a problem if you're simply compressing/archiving video footage.
 
-**Disclaimers**
+However, if you're wanting to stream the encoded version of that video at a target framerate, your hardware will need to encode at 60fps or higher as it's going. This is what is meant by real-time encoding.
 
-_It is possible that when you go to apply these settings in OBS Studio, or Sunshine's game stream hosting software,
+This is what occurs when you stream to Twitch (albeit with a lot more leniance), and what is happening when you are streaming from a gaming PC to a lighter client.
+
+### Disclaimers
+
+- It is possible that when you go to apply these settings in OBS Studio, or Sunshine's game stream hosting software,
 that the encoder/ffmpeg version being used there may perform different, i.e. most likely worse than this benchmarking
-tool._
+tool. With that in mind, the author has personal success with applying suggested encoder settings to sunshine and seeing a 1 to 1 performance. However your results may vary.
 
-_This tool only tells you whether your host system can encode the video at the given parameters; it does not tell you
+- This tool only tells you whether your host system can encode the video at the given parameters; it does not tell you
 whether the client you intend to stream <b>TO</b> can decode at the same speed. You may find that your client device
-cannot decode the incoming video as fast as it's sent._
+cannot decode the incoming video as fast as it's sent. The Moonlight streaming app has a nice statistics overlay that can help you identify if your client is the bottleneck.
 
-_You may find that what works on your machine, does not work on another with similar hardware. This is expected, and is
-why you should run the tool on your machine to get specific results to your setup._
+- You may find that what works on your machine, does not work on another with similar hardware. This is expected, and is
+why you should run the tool on your machine to get specific results to your setup.
 
+- Your encoder performance in real-life might vary if you play different game genres, or if you have overlays in your OBS studio setup.
+It is difficult/impossible to cover all possible inputs when benchmarking video encoding, however this tool does try it's best
+to get you 90% of the way there.
 ### Visually Lossless Terminology
 
 Any encoded video that scores >= 95 vmaf score is considered visually lossless, and is what you are shooting for in
@@ -289,15 +259,11 @@ terms of encoded video quality. Anything lower and you end up seeing minor block
 By default, the tool does not calculate vmaf score to initially focus on producing fps statistics. However, you can have
 the tool calculate vmaf score on each permutation by using the `-c` flag.
 
-Using `-c` in combination with `--
-
 ### Skipping Duplicate Scoring Permutations by Default
 
 By default, the benchmark will detect if encoder settings produce the same vmaf score as previously calculated ones.
-This is done during the initial pass of all encoder setting permutations for a given bitrate.
-
-Each subsequence bitrate & encoder settings permutation will effectively ignore duplicated encoder settings that produce
-duplicated vmaf results in an effort to cut down on pointless calculation time.
+This is done during the initial pass of all encoder setting permutations for a given bitrate. Any permutations that are
+found to produce the same result are skipped in future iterations.
 
 If you so desire, you can still have those permutations run and end up in the normal produced report by specifying
 the `-a` option.
@@ -305,19 +271,14 @@ the `-a` option.
 Note: a footnote to the results file will be added of what encoder settings produced similar results for your reference
 later.
 
-### Detecting video encoder overload & skipping by default
+### Detecting video encoder overload & skipping it
 
 If you've streamed using OBS Studio before, you might have seen:
 
 ![img.png](docs/obs-encoder-overload.png)
 
-This tool has logic in it to detect encoder overload as well, by keeping an eye on the <i>current fps</i> during
-encoding. For example, if the target fps is `60`, this tool will attempt to encode the source video file at
-exactly `60fps`.
-
-If at any point the tool detects that the current fps is less than the target, the tool will stop and indicate that an
-encoder overload has occurred. If you still wish to let these encodes keep going (to see full fps statistics), you can
-do this by providing the `-i` option to ignore when the encoder gets overloaded.
+If you are for example, encoding a 4k@60 input file, and you don't want to keep encoding if your encoder can't stay at or above 60fps,
+you can pass the `-d` option to detect overload and stop the benchmark/permutation.
 
 Note: in the stats output file, any encoder/bitrate/fps permutation that results in an overloaded encoder will have
 a `[O]` at the beginning of it's result stats.
@@ -333,7 +294,7 @@ when streaming to Twitch/Youtube. Any higher chroma subsample will produce lower
 Input source files are real gameplay captures. The two recorded FPS rates is 60 and 120, however the benchmark tool can
 encode at much higher rates if your hardware can support that.
 
-You can make your own conclusions about > 120 fps or < 60 fps bitrates that you'll need, since it's typically a linear
+You can make your own conclusions about > 120fps or < 60fps bitrates that you'll need, since it's typically a linear
 relationship. For example:
 
 ```text
@@ -342,13 +303,10 @@ relationship. For example:
 720@60  H264 -> 10Mb/s
 720@120 H264 -> 20Mb/s
 
-// you can guess that lower fps, and higher fps, will have a bitrate that scales accordingly:
-720@30  H264 -> 5Mb/s
-720@240 H264 -> 40Mb/s
+// with this in mind, you can guess that lower fps, and higher fps, will have a bitrate that scales accordingly:
+720@30  H264 -> 5Mb/s    (30fps is half the bitrate needed than 60 fps)
+720@240 H264 -> 40Mb/s   (240fps is twice the bitrate needed than 120fps)
 ```
-
-_Note: if you play a different genre of game, or you have overlays in your OBS studio setup, your encoding performance
-may vary. It is difficult/impossible to cover all possible inputs when benchmarking video encoding._
 
 ### Why results from one machine might not apply to another
 
@@ -375,19 +333,10 @@ the case with at-home game streaming where you're less bandwidth limited.
 Game streaming <i>outside your network</i> or over cellular is where you'll truly become bandwidth limited and where
 this tool can be useful.
 
-### FPS Statistics Do Not Change Much with Higher Bitrates
-
-This is expected. The bitrate value is simply how much data to transmit _after the encode has happened_, and typically
-does not affect how _fast_
-your encoder can encode an input.
-
-The tool defaults to not permuting over bitrate values due to this fact. The only reason you'd want to also permute over
-bitrates or try higher values, is to get a higher vmaf score or to achieve visually lossless video quality.
-
-### Number of threads used by VMAF in tool
+### Number of threads used by VMAF calculation in the tool
 
 The tool automatically chooses the maximum available threads on your machine (including hyper-threads). This ensures
-maximum performance when doing vmaf calculations.
+maximum performance when doing vmaf calculations and hopefully cuts down on the tools runtime.
 
 There are diminishing returns the more threads you throw at VMAF, but these small gains will make a huge difference when
 running through encoder permutations/benchmarks.
@@ -398,7 +347,7 @@ just specifying all threads.
 
 ### Use of 'n_subsample' for calculation speedup in VMAF
 
-The tool uses a value of the parameter `n_subsample=5` passed to VMAF, to cut down the vmaf calculation to almost half.
+The tool uses a value for the parameter `n_subsample=5` passed to VMAF, to cut down the vmaf calculation to almost half.
 This effectively tells VMAF to look every 5th frame when doing the score calculation.
 
 A <i>negligible</i> score difference of < 1 score point was observed when running through both low fps and high-fps
@@ -446,23 +395,24 @@ author's own system.
 
 ### Minimum Spec'd PC
 
-- <b>CPU:</b> <a href='## Issues, Bugs & Feature Requests'>Intel i5-8400 (6 cores/6 threads)</a>
+(No affiliate links in here, just for reference)
+- <b>CPU:</b> <a href='https://www.intel.com/content/www/us/en/products/sku/126687/intel-core-i58400-processor-9m-cache-up-to-4-00-ghz/specifications.html'>Intel i5-8400 (6 cores/6 threads)</a>
 - <b>RAM:</b> 16GB of <a href='https://a.co/d/0O1qryh'>G.Skill Ripjaws V DDR4 3200Mhz</a>
 - <b>GPU:</b> <a href='https://a.co/d/iJLdgKx'>Asus GTX 1660 Super</a>
 - <b>NVME SSD</b>: <a href='https://a.co/d/clUM7ta'>PNY250GB NVMe PCI Gen3 x4</a>
 - <b>NVENC Arch & Gen:</b> Turing, 7th Gen
 - <b>Nvidia Driver:</b> 527.56
 
-The following are the minimum bitrates you'd need to achieve visually lossless results on the above Turing GPU:
+The following are the minimum bitrates you'd need to achieve visually lossless results on the above Turing GPU.
 
-Note: HEVC is about 30% more efficient but that doesn't appear to make that huge of a difference in your ending bitrate.
+Note: HEVC is a more efficient compression algorithm, but it does not appear to affect the real-time bitrate that much. Use of either H264 or HEVC might come down to the max fps produced between the two.
 
 ```text
 NVENC H264: 720@60   -> 10Mb/s
 NVENC HEVC: 720@60   -> 5-10Mb/s
 
-NVENC H264: 720@120  -> 25Mb/s
-NVENC HEVC: 720@120  -> 20-25Mb/s
+NVENC H264: 720@120  -> 20Mb/s
+NVENC HEVC: 720@120  -> 15-20Mb/s
 
 NVENC H264: 1080@60  -> 20Mb/s
 NVENC HEVC: 1080@60  -> 15-20Mb/s
@@ -470,31 +420,29 @@ NVENC HEVC: 1080@60  -> 15-20Mb/s
 NVENC H264: 1080@120 -> 40Mb/s
 NVENC HEVC: 1080@120 -> 35-40Mb/s
 
-NVENC H264: 2K@60    -> 20-25Mb/s
+NVENC H264: 2K@60    -> 30Mb/s
 NVENC HEVC: 2K@60    -> 20-25Mb/s
 
 NVENC H264: 2K@120    -> 50-55Mb/s
 NVENC HEVC: 2K@120    -> 50Mb/s
 
-NVENC H264: 4K@60    -> 45-50Mb/s
+NVENC H264: 4K@60    -> 50Mb/s
 NVENC HEVC: 4K@60    -> 40-45Mb/s
 
-// Note: Turing GPU used could not get any higher than 4K@75-90 average fps
-// however, most likely the bitrate required for visually lossless 4K@120 is ~100Mb/s
+// Note: Turing GPU on minimum spec'd PC could not get any higher than 4K@75-90 average fps
+// however on a 3080ti with a stronger CPU, we could get 4k@120 with 100Mb/s
 
-NVENC H264: 4K@120   -> ???
-NVENC HEVC: 4K@120   -> ???
+NVENC H264: 4K@120   -> 100Mb/s
+NVENC HEVC: 4K@120   -> 90-100Mb/s
 ```
 
-Notice that with HEVC you can achieve the same level of visually lossless quality with slightly less bitrate, at least
-with NVENC. This is going to be the case with an AV1 encoder on newer GPU's. When at all possible, it's suggested to use
-the encoder that provides higher quality at a lower bitrate.
 ---
 
-## Issues, Bugs & Feature Requests
+## Feature Requests, Bugs or Issues
 
-Feel free to open issues in the repository if you find issues, and we'll try to get around to fixing them or
-implementing the feature requests.
+The author plans to add more encoder support, run the benchmark on a wide variety of hardware, and much much more. However, if you have an idea or feature you would like this tool to have, feel free to create an issue in the repository and the author will get back to you.
+
+This also applies to issues that you might find with existing features.
 
 Screenshots or log file uploads are much appreciated!
 
