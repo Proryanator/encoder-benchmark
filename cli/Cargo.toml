@@ -1,0 +1,8 @@
+[package]
+name = "cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dont_disappear = "3.0.1"
+environment = { path = "../environment" }

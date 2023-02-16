@@ -1,0 +1,12 @@
+[package]
+name = "ffmpeg"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+num_cpus = "1.15.0"
+filetime = "0.2.19"
+regex = "1.7.0"
+rev_buf_reader = "0.3.0"
