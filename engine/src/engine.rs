@@ -41,13 +41,23 @@ pub fn run_encode(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>
     return result;
 }
 
+pub fn log_permutation_header(index: usize, permutations: &Vec<Permutation>, calc_time: Option<Duration>, ignore_factor: c_float) {
+    log_header(index, permutations, calc_time, true, ignore_factor);
+}
+
 pub fn log_benchmark_header(index: usize, permutations: &Vec<Permutation>, calc_time: Option<Duration>) {
+    log_header(index, permutations, calc_time, false, 1 as c_float);
+}
+
+fn log_header(index: usize, permutations: &Vec<Permutation>, calc_time: Option<Duration>, log_eta: bool, ignore_factor: c_float) {
     let mut permutation = permutations[index].clone();
     let metadata = permutation.get_metadata();
-    if calc_time.is_some() {
-        println!("[ETR: {}]", format_dhms(calculate_eta(calc_time.unwrap(), index, permutations.len(), 1 as c_float)));
-    } else {
-        println!("[ETR: Unknown until first permutation is done]");
+    if log_eta {
+        if calc_time.is_some() {
+            println!("[ETR: {}]", format_dhms(calculate_eta(calc_time.unwrap(), index, permutations.len(), ignore_factor)));
+        } else {
+            println!("[ETR: Unknown until first permutation is done]");
+        }
     }
     println!("[Permutation:\t{}/{}]", index + 1, permutations.len());
     println!("[Resolution:\t{}x{}]", metadata.width, metadata.height);

@@ -11,7 +11,7 @@ use ffmpeg::args::FfmpegArgs;
 use ffmpeg::report_files::{extract_vmaf_score, get_latest_ffmpeg_report_file, read_last_line_at};
 use permutation::permutation::Permutation;
 
-use crate::engine::{log_benchmark_header, run_encode, spawn_ffmpeg_child};
+use crate::engine::{log_permutation_header, run_encode, spawn_ffmpeg_child};
 use crate::progressbar;
 use crate::progressbar::draw_yellow_bar;
 use crate::result::{log_results_to_file, PermutationResult};
@@ -46,11 +46,20 @@ impl PermutationEngine {
         let ctrl_channel = setup_ctrl_channel();
         let mut target_quality_found = false;
 
+        let mut ignore_factor = 1 as c_float;
         let mut calc_time: Option<Duration> = None;
         for i in 0..self.permutations.clone().len() {
             let permutation_start_time = SystemTime::now();
             let mut permutation = self.permutations[i].clone();
-            log_benchmark_header(i, &self.permutations, calc_time);
+            log_permutation_header(i, &self.permutations, calc_time, ignore_factor);
+
+            // if this permutation was added to the list of duplicates, skip to save calculation time
+            if will_be_duplicate(&self.dup_results, &permutation) {
+                draw_yellow_bar(permutation.get_metadata().frames);
+                println!("\n!!! Above encoder settings will produce identical vmaf score as other permutations, skipping... \n");
+                continue;
+            }
+
             let mut result = run_encode(permutation.clone(), &ctrl_channel);
             calc_time = Option::from(permutation_start_time.elapsed().unwrap());
 
@@ -66,20 +75,20 @@ impl PermutationEngine {
 
                 // take the vmaf calculation time into account for the total ETA calculation
                 calc_time = Option::from(permutation_start_time.elapsed().unwrap());
-
-                // if this permutation was added to the list of duplicates, skip to save calculation time
-                if will_be_duplicate(&self.dup_results, &result) {
-                    draw_yellow_bar(permutation.get_metadata().frames);
-                    println!("\n!!! Above encoder settings will produce identical vmaf score as other permutations, skipping... \n");
-                    continue;
-                }
             }
 
-            let is_bitrate_permutation_over = i == self.permutations.len() - 1 || self.permutations[i + 1].clone().bitrate != permutation.bitrate;
-            self.add_result(result, is_bitrate_permutation_over);
+            let is_initial_bitrate_permutation_over = i == self.permutations.len() - 1 || self.permutations[i + 1].clone().bitrate != permutation.bitrate;
+            self.add_result(result, is_initial_bitrate_permutation_over);
+
+            // we'll calculate the ignore factor of permutations that will be skipped
+            if is_initial_bitrate_permutation_over {
+                // % of permutations that we will actually permute over past the initial bitrate
+                let perm_count = self.results.len() + self.dup_results.len();
+                ignore_factor = self.results.len() as c_float / perm_count as c_float;
+            }
 
             // stop if we've found the target quality, and we're done permuting over the current bitrate
-            if target_quality_found && is_bitrate_permutation_over {
+            if target_quality_found && is_initial_bitrate_permutation_over {
                 println!("Found VMAF score >= {}, stopping permutations...", TARGET_QUALITY);
                 break;
             }
@@ -87,7 +96,7 @@ impl PermutationEngine {
 
         // produce output files and other logging here
         let runtime_str = format_dhms(runtime.elapsed().unwrap().as_secs());
-        log_results_to_file(self.results.clone(), &runtime_str, Vec::new(), 0, true);
+        log_results_to_file(self.results.clone(), &runtime_str, self.dup_results.clone(), self.permutations[0].bitrate, false);
         println!("Benchmark runtime: {}", runtime_str);
     }
 
@@ -156,9 +165,9 @@ fn check_encode_quality(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, 
     return vmaf_score;
 }
 
-fn will_be_duplicate(duplicates: &Vec<PermutationResult>, result: &PermutationResult) -> bool {
+fn will_be_duplicate(duplicates: &Vec<PermutationResult>, next_permutation: &Permutation) -> bool {
     for dup in duplicates {
-        if dup.encoder_settings == result.encoder_settings {
+        if dup.encoder_settings == next_permutation.encoder_settings {
             return true;
         }
     }

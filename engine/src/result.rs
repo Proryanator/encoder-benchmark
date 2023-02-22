@@ -55,13 +55,13 @@ impl PermutationResult {
     }
 }
 
-pub fn log_results_to_file(results: Vec<PermutationResult>, runtime_str: &String, dup_results: Vec<PermutationResult>, bitrate: u32, is_standard: bool) {
+pub fn log_results_to_file(results: Vec<PermutationResult>, runtime_str: &String, dup_results: Vec<PermutationResult>, bitrate: u32, is_benchmark: bool) {
     // might make this naming here more robust eventually
     let first_metadata = results.get(0).unwrap().metadata;
     let encoder = results.get(0).unwrap().encoder.as_str();
     let permute_file_name = format!("{}-{}-{}.log", encoder, first_metadata.get_res(), first_metadata.fps).to_string();
     let benchmark_file_name = format!("{}-benchmark.log", encoder).to_string();
-    let file_name = if is_standard { benchmark_file_name } else { permute_file_name };
+    let file_name = if is_benchmark { benchmark_file_name } else { permute_file_name };
 
     let mut w = File::create(file_name).unwrap();
 
@@ -74,7 +74,7 @@ pub fn log_results_to_file(results: Vec<PermutationResult>, runtime_str: &String
     writeln!(&mut w, "==================================================================================================================================================================").unwrap();
     writeln!(&mut w, "Benchmark runtime: {}\n", runtime_str).unwrap();
 
-    let has_logged_dup_header = false;
+    let mut has_logged_dup_header = false;
 
     // log out the duplicated results so we can keep track of them
     let initial_perms: Vec<PermutationResult> = results
@@ -98,6 +98,7 @@ pub fn log_results_to_file(results: Vec<PermutationResult>, runtime_str: &String
         if !has_logged_dup_header {
             writeln!(&mut w, "Encoder settings that produced identical scores:").unwrap();
             writeln!(&mut w, "==================================================================================================================================================================").unwrap();
+            has_logged_dup_header = true;
         }
 
         writeln!(&mut w, "Identical score: {}", perm.vmaf_score).unwrap();

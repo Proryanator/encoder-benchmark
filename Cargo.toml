@@ -6,6 +6,6 @@ members = [
     "environment",
     "ffmpeg",
     "permutation",
-    "permutor",
+    "permutor-cli",
     "cli"
 ]
