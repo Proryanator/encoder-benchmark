@@ -1,0 +1,15 @@
+[package]
+name = "benchmark"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.0.32", features = ["derive"] }
+figlet-rs = "0.1.5"
+text_io = "0.1.12"
+dont_disappear = "3.0.1"
+environment = { path = "../environment" }
+permutation = { path = "../permutation" }
+engine = { path = "../engine" }
+ffmpeg = { path = "../ffmpeg" }
+cli = { path = "../cli" }
