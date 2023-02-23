@@ -11,9 +11,6 @@ on:
       name:
         required: true
         type: string
-      body:
-        required: true
-        type: string
 
 permissions:
   # required for us to upload artifacts from the release
@@ -30,4 +27,3 @@ jobs:
       artifacts: "target/release/benchmark.exe,target/release/permutor-cli.exe"
       tag: ${{inputs.tag}}
       name: ${{inputs.name}}
-      body: ${{inputs.body}}

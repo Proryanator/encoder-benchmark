@@ -16,9 +16,6 @@ on:
       name:
         required: true
         type: string
-      body:
-        required: true
-        type: string
 
 jobs:
   setup-and-build:
@@ -52,7 +49,7 @@ jobs:
         with:
           artifacts: ${{inputs.artifacts}}
           name: ${{inputs.name}}
-          body: ${{inputs.body}}
+          # can eventually pull commit messages to include in the body
           tag: ${{inputs.tag}}
           # will remove this once the tool is out of the alpha/pre-release stage
           prerelease: true
