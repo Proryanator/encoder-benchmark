@@ -166,7 +166,7 @@ fn fig_title(msg: String, small_font_content: String) {
     let figure = small_font.convert(msg.as_str());
     assert!(figure.is_some());
     println!("{}\n", figure.unwrap());
-    println!("Version v0.0.1-alpha");
+    println!("Version v0.2.0-alpha");
     println!("Source code: https://github.com/Proryanator/encoder-benchmark\n");
 
     fs::remove_file(small_font_file_name).expect("Not able to delete tmp file");
