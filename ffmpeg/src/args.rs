@@ -149,6 +149,11 @@ mod tests {
     static ENCODER_ARGS: &str = "-preset hq -tune hq -profile:v high -rc cbr -multipass qres -rc-lookahead 8";
 
     #[test]
+    fn failing_test() {
+        assert_eq!(0, 1);
+    }
+
+    #[test]
     fn default_args_test() {
         let args = FfmpegArgs::default();
 
