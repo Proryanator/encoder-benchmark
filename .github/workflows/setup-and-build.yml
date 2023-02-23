@@ -1,0 +1,38 @@
+on:
+  workflow_call:
+    inputs:
+      platform:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  setup-and-build:
+    runs-on: ${{inputs.platform}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Rust
+        uses: ATiltedTree/setup-rust@v1
+        with:
+          rust-version: 1.66.0
+
+      - name: Build
+        run:
+          cargo build
+
+      # from https://github.com/actions/cache/blob/main/examples.md#rust---cargo
+      - name: Cache Rust Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{inputs.platform}}-${{github.sha}}
