@@ -4,6 +4,16 @@ on:
   workflow_dispatch:
     branches:
       - main
+    inputs:
+      tag:
+        required: true
+        type: string
+      name:
+        required: true
+        type: string
+      body:
+        required: true
+        type: string
 
 permissions:
   # required for us to upload artifacts from the release
@@ -18,3 +28,6 @@ jobs:
       # all other inputs will be done by hand
       platform: windows-2022
       artifacts: "target/release/benchmark.exe,target/release/permutor-cli.exe"
+      tag: ${{inputs.tag}}
+      name: ${{inputs.name}}
+      body: ${{inputs.body}}

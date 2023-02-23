@@ -9,7 +9,7 @@ on:
       artifacts:
         required: true
         type: string
-      # TODO: eventually we can auto-generate this
+      # you'll need to add these into your consuming job to expose them
       tag:
         required: true
         type: string
