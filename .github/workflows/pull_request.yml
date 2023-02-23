@@ -1,0 +1,26 @@
+name: Pull Request Workflow
+
+on:
+  pull_request:
+
+
+# maybe we can share these permissions
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  windows:
+    uses: ./.github/workflows/pull_request_workflow.yml
+    with:
+      platform: windows-2022
+
+  #linux:
+  #  uses: ./.github/workflows/pull_request_workflow.yml
+  #  with:
+  #    platform: ubuntu-20.04
+
+  #mac:
+  #  uses: ./.github/workflows/pull_request_workflow.yml
+  #  with:
+  #    platform: macos-12

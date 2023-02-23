@@ -1,0 +1,20 @@
+name: Windows Release Workflow
+
+on:
+  workflow_dispatch:
+    branches:
+      - main
+
+permissions:
+  # required for us to upload artifacts from the release
+  contents: write
+  pull-requests: read
+
+
+jobs:
+  windows-release:
+    uses: ./.github/workflows/release.yml
+    with:
+      # all other inputs will be done by hand
+      platform: windows-2022
+      artifacts: "target/release/benchmark.exe,target/release/permutor-cli.exe"

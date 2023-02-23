@@ -1,0 +1,60 @@
+name: Release Workflow
+
+on:
+  workflow_call:
+    inputs:
+      platform:
+        required: true
+        type: string
+      artifacts:
+        required: true
+        type: string
+      # TODO: eventually we can auto-generate this
+      tag:
+        required: true
+        type: string
+      name:
+        required: true
+        type: string
+      body:
+        required: true
+        type: string
+
+jobs:
+  setup-and-build:
+    uses: ./.github/workflows/setup-and-build.yml
+    with:
+      platform: ${{inputs.platform}}
+
+  release:
+    runs-on: ${{inputs.platform}}
+    needs: setup-and-build
+    permissions:
+      contents: write
+    steps:
+      - name: Restore Rust Dependencies
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{inputs.platform}}-${{github.sha}}
+
+      - name: Run Cargo Build
+        run:
+          cargo build --release
+
+      - name: Publish Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: ${{inputs.artifacts}}
+          name: ${{inputs.name}}
+          body: ${{inputs.body}}
+          tag: ${{inputs.tag}}
+          # will remove this once the tool is out of the alpha/pre-release stage
+          prerelease: true
+          # do we need this? Might want to review what's produced
+          draft: true

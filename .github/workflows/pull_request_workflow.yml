@@ -1,0 +1,37 @@
+on:
+  workflow_call:
+    inputs:
+      platform:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  setup-and-build:
+    uses: ./.github/workflows/setup-and-build.yml
+    with:
+      platform: ${{inputs.platform}}
+
+  unit-test:
+    runs-on: ${{inputs.platform}}
+    needs: setup-and-build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Restore Rust Dependencies
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{inputs.platform}}-${{github.sha}}
+
+      - name: Run Unit Tests
+        run: cargo test --no-fail-fast
