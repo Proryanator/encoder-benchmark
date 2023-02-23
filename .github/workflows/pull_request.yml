@@ -2,8 +2,6 @@ name: Pull Request Workflow
 
 on:
   pull_request:
-    branches:
-      - develop
 
 
 # maybe we can share these permissions
