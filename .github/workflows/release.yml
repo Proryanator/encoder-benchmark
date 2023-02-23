@@ -9,14 +9,11 @@ on:
       artifacts:
         required: true
         type: string
-      # TODO: eventually we can auto-generate this
+      # you'll need to add these into your consuming job to expose them
       tag:
         required: true
         type: string
       name:
-        required: true
-        type: string
-      body:
         required: true
         type: string
 
@@ -32,6 +29,9 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
       - name: Restore Rust Dependencies
         uses: actions/cache/restore@v3
         with:
@@ -52,7 +52,7 @@ jobs:
         with:
           artifacts: ${{inputs.artifacts}}
           name: ${{inputs.name}}
-          body: ${{inputs.body}}
+          # can eventually pull commit messages to include in the body
           tag: ${{inputs.tag}}
           # will remove this once the tool is out of the alpha/pre-release stage
           prerelease: true
