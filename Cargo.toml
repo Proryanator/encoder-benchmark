@@ -7,5 +7,6 @@ members = [
     "ffmpeg",
     "permutation",
     "permutor-cli",
-    "cli"
+    "cli",
+    "gpus"
 ]

@@ -17,6 +17,9 @@ pub struct BenchmarkCli {
     /// logs useful information to help troubleshooting
     #[arg(short, long)]
     pub verbose: bool,
+    /// the GPU you wish to run the encode on; defaults to the first/only GPU found in your system
+    #[arg(short, long, default_value = "0")]
+    pub gpu: u8,
     was_ui_opened: bool,
 }
 
@@ -32,6 +35,7 @@ impl BenchmarkCli {
             encoder: String::from(""),
             source_file: String::from(""),
             verbose: false,
+            gpu: 0,
             was_ui_opened: false,
         };
     }

@@ -13,3 +13,4 @@ permutation = { path = "../permutation" }
 engine = { path = "../engine" }
 ffmpeg = { path = "../ffmpeg" }
 cli = { path = "../cli" }
+gpus = { path = "../gpus" }

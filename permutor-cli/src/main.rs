@@ -16,7 +16,7 @@ fn main() {
     log_special_arguments(&cli);
 
     let mut engine = PermutationEngine::new();
-    let mut nvenc = Nvenc::new(cli.encoder == "hevc_nvenc");
+    let mut nvenc = Nvenc::new(cli.encoder == "hevc_nvenc", cli.gpu);
     for bitrate in get_bitrate_permutations(cli.bitrate, cli.max_bitrate_permutation.unwrap()) {
         build_setting_permutations(&mut engine, &mut nvenc, &cli, bitrate);
     }
