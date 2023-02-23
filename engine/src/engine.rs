@@ -6,6 +6,7 @@ use compound_duration::format_dhms;
 use crossbeam_channel::Receiver;
 use ctrlc::Error;
 
+use cli::cli_util::error_with_ack;
 use ffmpeg::args::FfmpegArgs;
 use ffmpeg::metadata::MetaData;
 use permutation::permutation::Permutation;
@@ -26,6 +27,12 @@ pub fn run_encode(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>
 
     // not sure what to do about these results here
     let mut trial_result = run_overload_benchmark(&metadata, &ffmpeg_args, p.verbose, p.detect_overload, &ctrl_channel);
+
+    // this should be a hard-stop for the program here
+    // perhaps abstract this method out
+    if trial_result.ffmpeg_error {
+        error_with_ack(true);
+    }
 
     result.was_overloaded = trial_result.was_overloaded;
     result.encode_time = encode_start_time.elapsed().unwrap().as_secs();
@@ -83,7 +90,10 @@ fn run_overload_benchmark(metadata: &MetaData, ffmpeg_args: &FfmpegArgs, verbose
 
     let trial_result = progressbar::watch_encode_progress(metadata.frames, detect_overload, metadata.fps, verbose, ffmpeg_args.stats_period, ctrl_channel);
 
-    if trial_result.was_overloaded && !was_ctrl_c_received(&ctrl_channel) {
+    if trial_result.ffmpeg_error && !was_ctrl_c_received(&ctrl_channel) {
+        let _ = child.kill();
+        println!("Ffmpeg encountered an error when attempting to run, double-check that your environment is setup correctly. If so, open an issue in github!");
+    } else if trial_result.was_overloaded && !was_ctrl_c_received(&ctrl_channel) {
         let _ = child.kill();
         println!("Encoder was overloaded and could not encode the video file in realtime, stopping...");
     }

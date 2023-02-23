@@ -14,3 +14,4 @@ indicatif = "0.17.2"
 stoppable_thread = "0.2.1"
 permutation = { path = "../permutation" }
 ffmpeg = { path = "../ffmpeg" }
+cli = { path = "../cli" }

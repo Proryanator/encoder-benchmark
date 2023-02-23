@@ -14,6 +14,7 @@ use crate::threads::exit_on_ctrl_c;
 pub struct TrialResult {
     pub all_fps: Vec<u16>,
     pub was_overloaded: bool,
+    pub ffmpeg_error: bool,
 }
 
 impl Default for TrialResult {
@@ -21,6 +22,7 @@ impl Default for TrialResult {
         TrialResult {
             all_fps: vec![],
             was_overloaded: false,
+            ffmpeg_error: false,
         }
     }
 }
@@ -37,13 +39,20 @@ pub fn watch_encode_progress(total_frames: u64, detect_overload: bool, target_fp
 
     // time it takes for the encoder to need to process the target # of frames
     let overload_time = time::Duration::from_secs(5);
+    let allowed_ffmpeg_downtime = time::Duration::from_secs(10);
+
     let mut checking_overload = false;
     let mut first_overload_detected = SystemTime::now();
+
+    let mut ffmpeg_error_check_time = SystemTime::now();
+    let mut checking_ffmpeg_error = false;
 
     // how many milliseconds has passed since the last frame stat
     let interval_adjustment = (1.0 / stats_period) as usize;
 
     let stat_listener = start_listening_to_ffmpeg_stats(verbose, &FRAME, &PREVIOUS_FRAME);
+
+    let mut last_frame = 0;
     loop {
         // important to not get stuck in this thread
         exit_on_ctrl_c(&ctrl_channel);
@@ -76,7 +85,25 @@ pub fn watch_encode_progress(total_frames: u64, detect_overload: bool, target_fp
             break;
         }
 
-        bar.set_position(FRAME.load(Ordering::Relaxed) as u64);
+        let new_frame = FRAME.load(Ordering::Relaxed) as u64;
+        bar.set_position(new_frame);
+
+        if new_frame != last_frame {
+            last_frame = new_frame;
+            checking_ffmpeg_error = false;
+        } else {
+            if !checking_ffmpeg_error {
+                // start a timer to detect if there has been an ffmpeg error (unlikely but just in case)
+                ffmpeg_error_check_time = SystemTime::now();
+                checking_ffmpeg_error = true;
+            }
+
+            // check whether we've sat for too long without any progress from ffmpeg
+            if ffmpeg_error_check_time.elapsed().unwrap() > allowed_ffmpeg_downtime {
+                trial_result.ffmpeg_error = true;
+                break;
+            }
+        }
     }
 
     // change bar style as read

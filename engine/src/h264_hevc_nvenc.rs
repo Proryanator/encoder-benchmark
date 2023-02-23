@@ -14,10 +14,11 @@ pub struct Nvenc {
     // might be able to make this the size we're expecting
     permutations: Vec<String>,
     index: i32,
+    gpu: u8,
 }
 
 impl Nvenc {
-    pub fn new(is_hevc: bool) -> Self {
+    pub fn new(is_hevc: bool, gpu: u8) -> Self {
         Self {
             presets: get_nvenc_presets(),
             tunes: get_nvenc_tunes(),
@@ -28,11 +29,12 @@ impl Nvenc {
             permutations: Vec::new(),
             // starts at -1, so that first next() will return the first element
             index: -1,
+            gpu,
         }
     }
 
     pub fn get_benchmark_settings(&self) -> String {
-        return format!("-preset p1 -tune ll -profile:v {} -rc cbr -cbr true", self.profiles.get(0).unwrap());
+        return format!("-preset p1 -tune ll -profile:v {} -rc cbr -cbr true -gpu {}", self.profiles.get(0).unwrap(), self.gpu);
     }
 
     fn has_next(&self) -> bool {
@@ -46,6 +48,7 @@ struct NvencSettings {
     tune: &'static str,
     profile: &'static str,
     rate_control: &'static str,
+    gpu: u8,
 }
 
 impl NvencSettings {
@@ -61,6 +64,8 @@ impl NvencSettings {
         args.push_str(self.rate_control);
         // always set this to constant bit rate to ensure reliable stream
         args.push_str(" -cbr true");
+        args.push_str(" -gpu ");
+        args.push_str(self.gpu.to_string().as_str());
 
         return args;
     }
@@ -104,6 +109,7 @@ impl Permute for Nvenc {
                 tune: unwrapped_perm.get(1).unwrap(),
                 profile: unwrapped_perm.get(2).unwrap(),
                 rate_control: unwrapped_perm.get(3).unwrap(),
+                gpu: self.gpu,
             };
 
             self.permutations.push(settings.to_string());
@@ -149,19 +155,19 @@ mod tests {
 
     #[test]
     fn create_h264_test() {
-        let nvenc = Nvenc::new(false);
+        let nvenc = Nvenc::new(false, 0);
         assert!(nvenc.profiles.contains(&"high"));
     }
 
     #[test]
     fn create_hevc_test() {
-        let nvenc = Nvenc::new(true);
+        let nvenc = Nvenc::new(true, 0);
         assert!(nvenc.profiles.contains(&"main"));
     }
 
     #[test]
     fn iterate_to_end_test() {
-        let mut nvenc = Nvenc::new(false);
+        let mut nvenc = Nvenc::new(false, 0);
         let perm_count = nvenc.init().len();
 
         let mut total = 0;
@@ -175,13 +181,13 @@ mod tests {
 
     #[test]
     fn total_permutations_test() {
-        let mut nvenc = Nvenc::new(false);
+        let mut nvenc = Nvenc::new(false, 0);
         assert_eq!(nvenc.init().len(), get_expected_len(&nvenc));
     }
 
     #[test]
     fn init_twice_not_double_test() {
-        let mut nvenc = Nvenc::new(false);
+        let mut nvenc = Nvenc::new(false, 0);
         nvenc.init();
         assert_eq!(nvenc.init().len(), get_expected_len(&nvenc));
     }

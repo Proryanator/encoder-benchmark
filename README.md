@@ -47,6 +47,9 @@ resolutions and framerates).
 A nice cross-platform tool to test your SSD's sequential read speeds: <a href='https://www.jazzdiskbench.com/'>Jazz Disk
 Bench</a>
 
+Note: the tool _does_ support selecting a specific GPU in your system if you have more than one, but you may experience
+PCI bottlenecking for GPU's not in the primary slot.
+
 ### Important notes about your system
 
 - do make sure your SSD drive in Windows does _not_ have drive compression enabled. This can severely affect your
@@ -88,7 +91,8 @@ Assuming you have followed the [Installation Setup Requirements](#installation--
 benchmark is as simple as:
 
 1) Opening the **benchmark** executable as you would any other program (double-click)
-2) Follow the on-screen instructions: select your encoder, and whether to run it on all resolutions or just a specific
+2) Follow the on-screen instructions: select your GPU (if you have more than 1, otherwise it auto-selects your only
+   card), select your encoder, and whether to run it on all resolutions or just a specific
    one
 3) Wait for the benchmark to finish, which should not take that long
 
@@ -194,6 +198,17 @@ When the tool detects that you've hit a `95` vmaf score, it will stop permuting.
 stop permuting once it gets to `50Mb/s` because we know that's the point where you get visually lossless 4K@60 with
 H264_NVENC, and any higher amount of bitrate does not significantly improve quality and can actually reduce encoder
 performance.
+
+### Running on a specific GPU in a multi-GPU system
+
+By default, the **permutor-cli** tool will run against the first GPU in your system that it sees.
+
+Much like how the benchmark tool allows for you to select what GPU to run on, the **permutor-cli** tool does this as
+well.
+With this tool it's as simple as providing the `-gpu 0` option, where 0 in this case would run against your first GPU.
+
+Note: if you are not sure which GPU is considered in the first slot, open the **benchmark** and it'll list the order of
+your cards for you.
 
 ## Applying your Findings
 

@@ -12,6 +12,7 @@ use engine::benchmark_engine::BenchmarkEngine;
 use engine::h264_hevc_nvenc::Nvenc;
 use engine::permute::Permute;
 use ffmpeg::metadata::MetaData;
+use gpus::get_gpus;
 use permutation::permutation::Permutation;
 
 use crate::benchmark_cli::BenchmarkCli;
@@ -24,11 +25,15 @@ fn main() {
     fig_title(String::from("Encoder-Benchmark"), String::from(small_font));
     let mut cli = BenchmarkCli::new();
 
+    // check how many Nvidia GPU's there are
+    // eventually will add support for checking AMD/Intel GPU's too
+    let gpus = get_gpus();
+
     // if no args were provided, they will be prompted from the user
     // this works for both cli running as well as just clicking the executable
     let args: Vec<String> = env::args().collect();
     if args.len() == 1 {
-        read_user_input(&mut cli);
+        read_user_input(&mut cli, gpus);
         cli.set_ui_opened();
     } else {
         cli = BenchmarkCli::parse();
@@ -38,7 +43,7 @@ fn main() {
 
     let input_files = get_input_files(cli.source_file);
     let mut engine = BenchmarkEngine::new();
-    let nvenc = Nvenc::new(cli.encoder == "hevc_nvenc");
+    let nvenc = Nvenc::new(cli.encoder == "hevc_nvenc", cli.gpu);
 
     // prepare permutations for the engine to run over
     for input in input_files {
@@ -55,7 +60,31 @@ fn main() {
     pause();
 }
 
-fn read_user_input(cli: &mut BenchmarkCli) {
+fn read_user_input(cli: &mut BenchmarkCli, gpus: Vec<String>) {
+    // if more than 1 GPU is identified, ask for the user to choose which one
+    if gpus.len() > 1 {
+        loop {
+            let str_vec = gpus.iter().map(|s| &**s).collect();
+            print_options(str_vec);
+            print!("Choose GPU [0-{}]: ", gpus.len() - 1);
+            let input: String = read!("{}");
+
+            if !is_numeric(&input) {
+                println!("Invalid input, try again...")
+            } else {
+                let value: u8 = input.parse().unwrap();
+
+                if value as usize >= gpus.len() {
+                    println!("Invalid input, try again...");
+                } else {
+                    cli.gpu = value;
+                    println!();
+                    break;
+                }
+            }
+        }
+    }
+
     loop {
         print_options(get_supported_encoders().to_vec());
         print!("Choose encoder [0-{}]: ", get_supported_encoders().len() - 1);
