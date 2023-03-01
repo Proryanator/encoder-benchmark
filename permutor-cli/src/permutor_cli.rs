@@ -13,6 +13,9 @@ pub struct PermutorCli {
     /// whether to run vmaf score on each permutation or not
     #[arg(short, long)]
     pub check_quality: bool,
+    /// when used with check_quality, encodes that produce the same quality will still be encoded
+    #[arg(short, long)]
+    pub(crate) allow_duplicate_scores: bool,
     // stop an encoding session if the encoder can't keep up with the input file's FPS
     #[arg(short, long)]
     pub detect_overload: bool,
@@ -51,6 +54,6 @@ impl PermutorCli {
     }
 
     pub fn has_special_options(&self) -> bool {
-        return self.check_quality || self.detect_overload || self.verbose || self.test_run;
+        return self.check_quality || self.detect_overload || self.verbose || self.test_run || self.allow_duplicate_scores;
     }
 }

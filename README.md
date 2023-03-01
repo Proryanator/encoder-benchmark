@@ -54,7 +54,10 @@ PCI bottlenecking for GPU's not in the primary slot.
 
 - do make sure your SSD drive in Windows does _not_ have drive compression enabled. This can severely affect your
   sequential read speeds, which is very important for reading high resolution/fps input files
-- the tool does _not_ support multiple Nvidia GPU's in your system, so it's suggested to just have 1 in your system
+- the tool supports multiple Nvidia GPU's in your system for both the benchmark & permutor-cli tool, so you can feel
+  free to have more than 1 for your testing (although the benchmark would only run against one)
+- the tool does _not_ support multiple AMD GPU's for the benchmark tool, but you are able to still specify _-gpu_ with
+  the permutor-cli tool
 
 ---
 

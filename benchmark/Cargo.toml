@@ -14,3 +14,4 @@ engine = { path = "../engine" }
 ffmpeg = { path = "../ffmpeg" }
 cli = { path = "../cli" }
 gpus = { path = "../gpus" }
+codecs = { path = "../codecs" }

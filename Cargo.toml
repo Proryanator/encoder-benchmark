@@ -8,5 +8,6 @@ members = [
     "permutation",
     "permutor-cli",
     "cli",
-    "gpus"
+    "gpus",
+    "codecs"
 ]

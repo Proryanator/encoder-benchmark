@@ -9,6 +9,7 @@ pub struct Permutation {
     pub bitrate: u32,
     pub metadata: MetaData,
     pub check_quality: bool,
+    pub allow_duplicates: bool,
     pub detect_overload: bool,
     pub verbose: bool,
 }
@@ -22,6 +23,7 @@ impl Permutation {
             bitrate: 0,
             metadata: MetaData::new(),
             check_quality: false,
+            allow_duplicates: false,
             detect_overload: false,
             verbose: false,
         }
