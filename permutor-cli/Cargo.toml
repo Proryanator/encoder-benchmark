@@ -12,3 +12,4 @@ engine = { path = "../engine" }
 cli = { path = "../cli" }
 permutation = { path = "../permutation" }
 ffmpeg = { path = "../ffmpeg" }
+codecs = { path = "../codecs" }

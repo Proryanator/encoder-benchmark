@@ -17,6 +17,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "cli",
+ "codecs",
  "dont_disappear",
  "engine",
  "environment",
@@ -88,6 +89,13 @@ version = "0.1.0"
 dependencies = [
  "dont_disappear",
  "environment",
+]
+
+[[package]]
+name = "codecs"
+version = "0.1.0"
+dependencies = [
+ "itertools",
 ]
 
 [[package]]
@@ -297,7 +305,6 @@ dependencies = [
  "ctrlc",
  "ffmpeg",
  "indicatif",
- "itertools",
  "permutation",
  "stoppable_thread",
 ]
@@ -548,6 +555,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "cli",
+ "codecs",
  "engine",
  "environment",
  "ffmpeg",

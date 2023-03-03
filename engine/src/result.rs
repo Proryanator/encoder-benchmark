@@ -68,7 +68,15 @@ pub fn log_results_to_file(results: Vec<PermutationResult>, runtime_str: &String
     writeln!(&mut w, "Results from entire permutation:").unwrap();
     writeln!(&mut w, "==================================================================================================================================================================").unwrap();
     writeln!(&mut w, "   [Resolution]\t[FPS]\t[Bitrate]\t[Encode Time]\t[VMAF Time]\t[VMAF Score]\t[Average FPS]\t[1%'ile]\t[90%'ile]\t[Encoder Settings]").unwrap();
+    let mut current_bitrate = 0;
+
     for result in &results {
+        // print a line split between bitrate permutations for improved readability
+        if !is_benchmark && current_bitrate != result.bitrate {
+            writeln!(&mut w, "##################################################################################################################################################################").unwrap();
+            current_bitrate = result.bitrate;
+        }
+
         writeln!(&mut w, "{}", result.to_string()).unwrap();
     }
     writeln!(&mut w, "==================================================================================================================================================================").unwrap();

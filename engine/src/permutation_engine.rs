@@ -54,7 +54,7 @@ impl PermutationEngine {
             log_permutation_header(i, &self.permutations, calc_time, ignore_factor);
 
             // if this permutation was added to the list of duplicates, skip to save calculation time
-            if will_be_duplicate(&self.dup_results, &permutation) {
+            if !permutation.allow_duplicates && permutation.check_quality && will_be_duplicate(&self.dup_results, &permutation) {
                 draw_yellow_bar(permutation.get_metadata().frames);
                 println!("\n!!! Above encoder settings will produce identical vmaf score as other permutations, skipping... \n");
                 continue;
@@ -78,7 +78,7 @@ impl PermutationEngine {
             }
 
             let is_initial_bitrate_permutation_over = i == self.permutations.len() - 1 || self.permutations[i + 1].clone().bitrate != permutation.bitrate;
-            self.add_result(result, is_initial_bitrate_permutation_over);
+            self.add_result(result, is_initial_bitrate_permutation_over, permutation.check_quality, permutation.allow_duplicates);
 
             // we'll calculate the ignore factor of permutations that will be skipped
             if is_initial_bitrate_permutation_over {
@@ -104,10 +104,10 @@ impl PermutationEngine {
         self.permutations.push(permutation);
     }
 
-    fn add_result(&mut self, result: PermutationResult, is_bitrate_permutation_over: bool) {
+    fn add_result(&mut self, result: PermutationResult, is_bitrate_permutation_over: bool, is_checking_quality: bool, allow_duplicates: bool) {
         // only do this duplicate mapping during the first bitrate permutation
         // notice how we do not add this for overloaded results
-        if !result.was_overloaded && !is_bitrate_permutation_over {
+        if !allow_duplicates && is_checking_quality && !result.was_overloaded && !is_bitrate_permutation_over {
             let score_str = result.vmaf_score.to_string();
             if !self.vmaf_scores.contains(&score_str) {
                 self.results.push(result);

@@ -8,9 +8,12 @@ use text_io::read;
 
 use cli::cli_util::{is_dev, pause};
 use cli::supported::{get_supported_encoders, get_supported_inputs};
+use codecs::amf::Amf;
+use codecs::get_vendor_for_codec;
+use codecs::nvenc::Nvenc;
+use codecs::permute::Permute;
+use codecs::vendor::Vendor;
 use engine::benchmark_engine::BenchmarkEngine;
-use engine::h264_hevc_nvenc::Nvenc;
-use engine::permute::Permute;
 use ffmpeg::metadata::MetaData;
 use gpus::get_gpus;
 use permutation::permutation::Permutation;
@@ -41,15 +44,13 @@ fn main() {
 
     cli.validate();
 
-    let input_files = get_input_files(cli.source_file);
+    let input_files = get_input_files(cli.source_file.clone());
     let mut engine = BenchmarkEngine::new();
-    let nvenc = Nvenc::new(cli.encoder == "hevc_nvenc", cli.gpu);
-
     // prepare permutations for the engine to run over
     for input in input_files {
         let mut permutation = Permutation::new(input, cli.encoder.clone());
-        let settings = get_settings_for(&nvenc);
-        let bitrate = get_bitrate_for(&permutation.get_metadata());
+        let settings = get_benchmark_settings_for(&cli);
+        let bitrate = get_bitrate_for(&permutation.get_metadata(), cli.encoder.clone());
 
         permutation.bitrate = bitrate;
         permutation.encoder_settings = settings;
@@ -151,14 +152,32 @@ fn print_options(input_vec: Vec<&str>) {
     }
 }
 
-fn get_settings_for(nvenc: &Nvenc) -> String {
-    // need to support other encoders here
-    return nvenc.get_benchmark_settings();
+fn get_benchmark_settings_for(cli: &BenchmarkCli) -> String {
+    let vendor = get_vendor_for_codec(&cli.encoder);
+
+    return match vendor {
+        Vendor::Nvidia => {
+            let nvenc = Nvenc::new(cli.encoder == "hevc_nvenc", cli.gpu);
+            nvenc.get_benchmark_settings()
+        }
+
+        Vendor::AMD => {
+            let amf = Amf::new(cli.encoder == "hevc_nvenc", cli.gpu);
+            amf.get_benchmark_settings()
+        }
+        Vendor::Unknown => {
+            // nothing to do here
+            String::from("")
+        }
+    };
 }
 
-fn get_bitrate_for(metadata: &MetaData) -> u32 {
-    // need to support other encoders here
-    return *Nvenc::get_resolution_to_bitrate_map(metadata.fps).get(&metadata.get_res()).unwrap();
+fn get_bitrate_for(metadata: &MetaData, string: String) -> u32 {
+    if string.contains("nvenc") {
+        return *Nvenc::get_resolution_to_bitrate_map(metadata.fps).get(&metadata.get_res()).unwrap();
+    } else {
+        return *Amf::get_resolution_to_bitrate_map(metadata.fps).get(&metadata.get_res()).unwrap();
+    }
 }
 
 fn get_input_files(source_file: String) -> Vec<String> {

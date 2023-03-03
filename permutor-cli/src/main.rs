@@ -1,8 +1,11 @@
 use clap::Parser;
 
-use engine::h264_hevc_nvenc::Nvenc;
+use codecs::amf::Amf;
+use codecs::get_vendor_for_codec;
+use codecs::nvenc::Nvenc;
+use codecs::permute::Permute;
+use codecs::vendor::Vendor;
 use engine::permutation_engine::PermutationEngine;
-use engine::permute::Permute;
 use permutation::permutation::Permutation;
 
 use crate::permutor_cli::PermutorCli;
@@ -16,9 +19,17 @@ fn main() {
     log_special_arguments(&cli);
 
     let mut engine = PermutationEngine::new();
-    let mut nvenc = Nvenc::new(cli.encoder == "hevc_nvenc", cli.gpu);
+    let vendor = get_vendor_for_codec(&cli.encoder.clone());
     for bitrate in get_bitrate_permutations(cli.bitrate, cli.max_bitrate_permutation.unwrap()) {
-        build_setting_permutations(&mut engine, &mut nvenc, &cli, bitrate);
+        match vendor {
+            Vendor::Nvidia => {
+                build_nvenc_setting_permutations(&mut engine, &cli, bitrate);
+            }
+            Vendor::AMD => {
+                build_amf_setting_permutations(&mut engine, &cli, bitrate);
+            }
+            Vendor::Unknown => {}
+        }
     }
 
     engine.run();
@@ -35,6 +46,10 @@ fn log_special_arguments(cli: &PermutorCli) {
             println!("  -calculating vmaf score");
         }
 
+        if cli.allow_duplicate_scores {
+            println!("  -ignoring whether expected vmaf score will be duplicated");
+        }
+
         if cli.verbose {
             println!("  -verbose enabled");
         }
@@ -45,7 +60,9 @@ fn log_special_arguments(cli: &PermutorCli) {
     }
 }
 
-fn build_setting_permutations(engine: &mut PermutationEngine, nvenc: &mut Nvenc, cli: &PermutorCli, bitrate: u32) {
+fn build_nvenc_setting_permutations(engine: &mut PermutationEngine, cli: &PermutorCli, bitrate: u32) {
+    let mut nvenc = Nvenc::new(cli.encoder == "hevc_nvenc", cli.gpu);
+
     // initialize the permutations each time
     nvenc.init();
 
@@ -57,6 +74,31 @@ fn build_setting_permutations(engine: &mut PermutationEngine, nvenc: &mut Nvenc,
         permutation.check_quality = cli.check_quality;
         permutation.verbose = cli.verbose;
         permutation.detect_overload = cli.detect_overload;
+        permutation.allow_duplicates = cli.allow_duplicate_scores;
+        engine.add(permutation);
+
+        // break out early here to just make 1 permutation
+        if cli.test_run {
+            break;
+        }
+    }
+}
+
+fn build_amf_setting_permutations(engine: &mut PermutationEngine, cli: &PermutorCli, bitrate: u32) {
+    let mut amf = Amf::new(cli.encoder == "hevc_amf", cli.gpu);
+
+    // initialize the permutations each time
+    amf.init();
+
+    while let Some((_encoder_index, settings)) = amf.next() {
+        let mut permutation = Permutation::new(cli.source_file.clone(), cli.encoder.clone());
+        permutation.video_file = cli.source_file.clone();
+        permutation.encoder_settings = settings;
+        permutation.bitrate = bitrate;
+        permutation.check_quality = cli.check_quality;
+        permutation.verbose = cli.verbose;
+        permutation.detect_overload = cli.detect_overload;
+        permutation.allow_duplicates = cli.allow_duplicate_scores;
         engine.add(permutation);
 
         // break out early here to just make 1 permutation
