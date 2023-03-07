@@ -1,20 +1,33 @@
 ## Realtime Video Encoding Tools
 
+### Contents
+
+- [Overview](#overview)
+- [Minimum System Specs Suggested](#minimum-system-specs-suggested)
+- [Installation and Setup](#installation-and-setup)
+- [Benchmark Tool Quick Run Guide](#benchmark-tool-quick-run-guide)
+- [Permutor Cli Quick Run Guide](#permutor-cli-quick-run-guide)
+- [Permutor Cli Common Commands and Use Cases](#permutor-cli-common-commands-and-use-cases)
+- [Applying your Findings](#applying-your-findings)
+- [Author's Research Findings and Discussion](#authors-research-findings-and-discussion)
+
+## Overview
+
 ### Project Goals
 
 This project aims to be _the_ standardized video encoding benchmark, easily accessible to all. The tools provided here
 can:
 
-- easily compare two GPU encoders, in terms of produced quality, and maximum fps with ease
+- easily compare GPU encoders of different generations, in terms of produced quality and maximum fps with ease
 - help identify optimal video encoder settings & bitrates for emerging hardware and new encoders
 - help you identify the maximum possible achievable quality at a given bitrate, resolution, and fps for your hardware
 - identify maximum capabilities to be applied to OBS Studio, or author's
   suggested [Game Streaming Software](#streaming-host--client-software-suggestions) for streaming games anywhere
+- identify optimal encoder settings that allow you to squeeze the most quality out of a bitrate limited streaming environment, such as streaming to Twitch or Youtube at low bitrates
 
 ### The Two Tools
 
-- **benchmark** - one-click pre-configured encoding benchmark that runs on your chosen encoder, useful for comparing
-  different system capabilities
+- **benchmark** - one-click pre-configured encoding benchmark that runs on your chosen encoder, useful for a quick-check of your GPU's performance at various resolutions/framerates
 - **permutor-cli** - command-line tool to iterate over all possible encoder settings and bitrates to find
   encoder limitations, in both performance and quality
 
@@ -37,7 +50,7 @@ resolutions and framerates).
 - <b>Processor:</b> CPU with at least 6 cores
 - <b>GPU:</b> Nvidia GPU w/ a hardware encoder, in the main x16 PCI slot of your PC (for max PCI bandwidth)
 - <b>Memory:</b> >= 8GB RAM (higher is always better)
-- <b>Storage Space:</b> 90GB minimum on the target SSD (all benchmark files take up about 90GB)
+- <b>Storage Space:</b> 3-12GB depending on target resolution/framerate, 90GB for the full benchmark
 - <b>Storage Type/Speed:</b>
     - if benchmarking <= 2k@60, any SATA SSD will work just fine
     - if benchmarking >= 2k@120, you MUST use an m.2 nvme drive with speeds upwards of 1.1GB/s
@@ -61,7 +74,7 @@ PCI bottlenecking for GPU's not in the primary slot.
 
 ---
 
-## Installation & Setup requirements
+## Installation and Setup
 
 Note: tool has been tested with ffmpeg version `5.1.2`, so it's highly suggested to use the same version, or at least
 version `5.*` of ffmpeg/ffprobe.
@@ -86,7 +99,7 @@ version `5.*` of ffmpeg/ffprobe.
 
 ---
 
-## Benchmark Tool Quick-Run Guide
+## Benchmark Tool Quick Run Guide
 
 ### Running the benchmark tool
 
@@ -149,7 +162,7 @@ any noticeable improvement in encode quality.
 For more in-depth analysis of the fps statistics and what it tells you,
 see [How to Interpret FPS Statistics](#how-to-interpret-fps-statistics).
 
-## Permutor-Cli Quick-Run Guide
+## Permutor Cli Quick Run Guide
 
 Note: the **permutor-cli** tool is designed to be run from a terminal or command-line, and will not work if you
 double-click it like the **benchmark** will.
@@ -167,7 +180,7 @@ some [common use cases](#permutor-cli-common-commandsuse-cases) for a clearer un
 
 Kill the tool at any time by hitting `ctrl-c` in the terminal/console where the tool is running.
 
-## Permutor-Cli Common Commands/Use Cases
+## Permutor Cli Common Commands and Use Cases
 
 ### Identifying the best encoder settings for a given resolution, framerate, and bitrate
 
@@ -215,32 +228,44 @@ your cards for you.
 
 ## Applying your Findings
 
-If you have not heard of the game streaming tools Moonlight or Sunshine mentioned below, a quick
-read [here](#streaming-host--client-software-suggestions) will help.
+This section details out how to use knowledge you've gained from this tool in software like Sunshine, Moonlight, OBS Studio, and many more.
 
-### Game Streaming with Moonlight/Sunshine
+### Updating Encoder Settings in Sunshine
+
+We'll first be discussing how to change encoder settings in Sunshine. Bitrate settings will not be something you can set in Sunshine, but will be something you can change in your Moonlight app on your computer or other streaming device.
+
+As of February 2023, Nvidia is stopping support of it's own home GameStream service bundled with GeForce Experience. Introducing <a href='https://github.com/LizardByte/Sunshine/releases'>Sunshine</a>, the open-source alternative that runs on your gaming rig, and encodes your gameplay footage to be streamed to other devices, like another computer or even your phone. Sunshine, unlike other streaming programs like Nvidia's GameStream, allows you to customize some encoding settings that can often out-perform Nvidia's GameStream program.
+
+Note: we'll assume that you already have a Sunshine server setup and that you have attached at least one client device. Sunshine sets some encoder settings by default, at the time of writing this, for Nvidia encoders the default preset is `p4`. You can view the currently used encoder settings by going to `youripaddress:47990 -> Web UI -> Configuration -> NVIDIA NVENC Encoder / Intel QuickSync Encoder / AMD AMF Encoder`.
+
+Let's say that using the tools in this project, you identified that of all the possible encoder settings for NVENC_H264 on your 3080, the settings that allowed you to encode 4K@120 were:
+
+`-preset p1 -tune ll -profile:v high -rc cbr`
+
+To apply these settings in Sunshine (for Nvidia), go to `Web UI -> Configuration -> NVIDIA NVENC Encoder` and change to the following values in the dropdowns:
+
+```
+NVENC Preset: p1 -- fastest (lowest quality)
+NVENC Tune: ll -- low latency
+NVENC Rate Control: cbr -- constant bitrate
+```
+
+You may have noticed that you could not set the profile for the encoder in Sunshine. Sunshine does not expose _all_ encoder settings, but exposes the ones that make the most impact to your encode (most likely Sunshine defaults profile to high). Perhaps in a future update you'll be able to specify more settings but, for now you may be limited.
+
+Once you've saved these settings, Sunshine will now encode your game using your specific settings, enabling you to stream at potentially higher framerates, or framerates with higher 1% lows than before. (Author was not able to get higher than 4K@90 with default settings in Sunshine and Nvidia's GameStreaming service, but with the findings from this tool, is able to get stable 4K@120).
+
+### Applying Bitrate Knowledge in Moonlight App
 
 When using Moonlight as your game streaming client, it auto-recommends a bitrate for you to stream at. Most of the time
 this is pretty accurate for lower resolutions, however depending on your hardware's capabilities you might be able to
-get away with less bitrate than it suggests.
+get away with less bitrate than it suggests. Even moreso, some AMD GPU's need way more bitrate than Nvidia cards, so you'll want to know if you'll need much higher bitrates.
 
 For example: Moonlight auto-selects `80Mb/s` for streaming 4K@60 game content. However from our testing, you really only
-need `50Mb/s` when encoding using H264_NVENC. (findings from this tool fall in-line with Youtube's own suggested bitrate
-for 4K@60).
+need `50Mb/s` when encoding using H264_NVENC. Notice that this applies to _nvenc_ encoders on Nvidia GPU's, and may or may not apply for other vendor GPU's, even using the same H264 algorithm.
 
-Finding out the minimum bitrate needed for a given resolution/framerate will help you determine whether you _physically
-can_ stream at the given resolution/framerate at all, and whether the location you are streaming _to_ has enough bitrate
-to support it.
+After running the tool on a 4K@60 input file, we know we can get a visually lossless streaming experience with just 50Mb/s on our Nvidia GPU. We also know that, if we are attempting to stream our games outside our home network, we know that our cellular connection speeds or wifi speeds should be at least 50Mb/s to get a clean 4K@60. In addition to this, our gaming rig (and home network upload speeds) should also be capable of 50Mb/s.
 
-After running the tool on the above example, we know that if a Moonlight client device having a download bitrate speed
-of 50Mb/s, and the host machine where the game is running has the upload speed of at least 50Mb/s, we can cleanly stream
-the game.
-
-### Real example of bitrates and capabilities
-
-For a real-world example of hardware capabilities identified by this tool, or what bitrate to use in Moonlight when
-doing at home game streaming, see [Expected Performance](#expected-performance). The author ran the tooling on his GTX
-1660 Super and learned the maximum capabilities of his machine.
+The tools here enable you to know whether you can actually stream to where you are, or if you are bitrate limited, encoder hardware limited, or somewhere in-between. It's easier to know if you can stream games to your phone while on cellular data, and know what resolution & framerate to set your stream to given that you are bitrate limited.
 
 ### Streaming with OBS Studio
 
@@ -248,11 +273,10 @@ TBD
 
 ---
 
-## Discussion
+## Author's Research Findings and Discussion
 
 A _lot_ of research has gone into the development of this tool, and some decisions were made along the way that might
-not be obvious to why some conclusions were drawn. See the various below sections for in-depth discussions around the
-tool.
+not be obvious to why some conclusions were drawn. This section is also for you if you are interested in some nitty-gritty details of video encoding, from SSD i/o read speed limitations, framerate statistics, and some design decisions of the tool made by the author during development.
 
 ### Streaming Host & Client Software Suggestions
 
