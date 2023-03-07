@@ -54,6 +54,7 @@ fn main() {
 
         permutation.bitrate = bitrate;
         permutation.encoder_settings = settings;
+        permutation.verbose = cli.verbose;
         engine.add(permutation);
     }
 
@@ -136,6 +137,20 @@ fn read_user_input(cli: &mut BenchmarkCli, gpus: Vec<String>) {
                     break;
                 }
             }
+        }
+    }
+
+    loop {
+        print!("\nRun with verbose mode? [y/n]: ");
+        let full: String = read!("{}");
+        if full != "n" && full != "y" {
+            println!("Invalid input, try again...");
+        } else {
+            if full == "y" {
+                cli.verbose = true;
+            }
+
+            break;
         }
     }
 

@@ -31,7 +31,7 @@ impl BenchmarkEngine {
             let permutation = self.permutations[i].clone();
             // benchmark will not log ETA since every encode will be different
             log_benchmark_header(i, &self.permutations, calc_time);
-            self.results.push(run_encode(permutation, &ctrl_channel));
+            self.results.push(run_encode(permutation.clone(), &ctrl_channel));
             calc_time = Option::from(permutation_start_time.elapsed().unwrap());
         }
 
