@@ -23,11 +23,13 @@ can:
 - help you identify the maximum possible achievable quality at a given bitrate, resolution, and fps for your hardware
 - identify maximum capabilities to be applied to OBS Studio, or author's
   suggested [Game Streaming Software](#streaming-host--client-software-suggestions) for streaming games anywhere
-- identify optimal encoder settings that allow you to squeeze the most quality out of a bitrate limited streaming environment, such as streaming to Twitch or Youtube at low bitrates
+- identify optimal encoder settings that allow you to squeeze the most quality out of a bitrate limited streaming
+  environment, such as streaming to Twitch or Youtube at low bitrates
 
 ### The Two Tools
 
-- **benchmark** - one-click pre-configured encoding benchmark that runs on your chosen encoder, useful for a quick-check of your GPU's performance at various resolutions/framerates
+- **benchmark** - one-click pre-configured encoding benchmark that runs on your chosen encoder, useful for a quick-check
+  of your GPU's performance at various resolutions/framerates
 - **permutor-cli** - command-line tool to iterate over all possible encoder settings and bitrates to find
   encoder limitations, in both performance and quality
 
@@ -107,9 +109,14 @@ Assuming you have followed the [Installation Setup Requirements](#installation--
 benchmark is as simple as:
 
 1) Opening the **benchmark** executable as you would any other program (double-click)
-2) Follow the on-screen instructions: select your GPU (if you have more than 1, otherwise it auto-selects your only
-   card), select your encoder, and whether to run it on all resolutions or just a specific
-   one
+2) Follow the on-screen instructions:
+
+- select your GPU (if you have more than 1, otherwise it auto-selects your only
+  card)
+- select your encoder
+- select whether to run the benchmark on all resolutions or just a specific one
+- select whether you want to run it in verbose mode for extra logging (useful for error debugging)
+
 3) Wait for the benchmark to finish, which should not take that long
 
 ![img.png](docs/benchmark.png)
@@ -228,21 +235,32 @@ your cards for you.
 
 ## Applying your Findings
 
-This section details out how to use knowledge you've gained from this tool in software like Sunshine, Moonlight, OBS Studio, and many more.
+This section details out how to use knowledge you've gained from this tool in software like Sunshine, Moonlight, OBS
+Studio, and many more.
 
 ### Updating Encoder Settings in Sunshine
 
-We'll first be discussing how to change encoder settings in Sunshine. Bitrate settings will not be something you can set in Sunshine, but will be something you can change in your Moonlight app on your computer or other streaming device.
+We'll first be discussing how to change encoder settings in Sunshine. Bitrate settings will not be something you can set
+in Sunshine, but will be something you can change in your Moonlight app on your computer or other streaming device.
 
-As of February 2023, Nvidia is stopping support of it's own home GameStream service bundled with GeForce Experience. Introducing <a href='https://github.com/LizardByte/Sunshine/releases'>Sunshine</a>, the open-source alternative that runs on your gaming rig, and encodes your gameplay footage to be streamed to other devices, like another computer or even your phone. Sunshine, unlike other streaming programs like Nvidia's GameStream, allows you to customize some encoding settings that can often out-perform Nvidia's GameStream program.
+As of February 2023, Nvidia is stopping support of it's own home GameStream service bundled with GeForce Experience.
+Introducing <a href='https://github.com/LizardByte/Sunshine/releases'>Sunshine</a>, the open-source alternative that
+runs on your gaming rig, and encodes your gameplay footage to be streamed to other devices, like another computer or
+even your phone. Sunshine, unlike other streaming programs like Nvidia's GameStream, allows you to customize some
+encoding settings that can often out-perform Nvidia's GameStream program.
 
-Note: we'll assume that you already have a Sunshine server setup and that you have attached at least one client device. Sunshine sets some encoder settings by default, at the time of writing this, for Nvidia encoders the default preset is `p4`. You can view the currently used encoder settings by going to `youripaddress:47990 -> Web UI -> Configuration -> NVIDIA NVENC Encoder / Intel QuickSync Encoder / AMD AMF Encoder`.
+Note: we'll assume that you already have a Sunshine server setup and that you have attached at least one client device.
+Sunshine sets some encoder settings by default, at the time of writing this, for Nvidia encoders the default preset
+is `p4`. You can view the currently used encoder settings by going
+to `youripaddress:47990 -> Web UI -> Configuration -> NVIDIA NVENC Encoder / Intel QuickSync Encoder / AMD AMF Encoder`.
 
-Let's say that using the tools in this project, you identified that of all the possible encoder settings for NVENC_H264 on your 3080, the settings that allowed you to encode 4K@120 were:
+Let's say that using the tools in this project, you identified that of all the possible encoder settings for NVENC_H264
+on your 3080, the settings that allowed you to encode 4K@120 were:
 
 `-preset p1 -tune ll -profile:v high -rc cbr`
 
-To apply these settings in Sunshine (for Nvidia), go to `Web UI -> Configuration -> NVIDIA NVENC Encoder` and change to the following values in the dropdowns:
+To apply these settings in Sunshine (for Nvidia), go to `Web UI -> Configuration -> NVIDIA NVENC Encoder` and change to
+the following values in the dropdowns:
 
 ```
 NVENC Preset: p1 -- fastest (lowest quality)
@@ -250,22 +268,34 @@ NVENC Tune: ll -- low latency
 NVENC Rate Control: cbr -- constant bitrate
 ```
 
-You may have noticed that you could not set the profile for the encoder in Sunshine. Sunshine does not expose _all_ encoder settings, but exposes the ones that make the most impact to your encode (most likely Sunshine defaults profile to high). Perhaps in a future update you'll be able to specify more settings but, for now you may be limited.
+You may have noticed that you could not set the profile for the encoder in Sunshine. Sunshine does not expose _all_
+encoder settings, but exposes the ones that make the most impact to your encode (most likely Sunshine defaults profile
+to high). Perhaps in a future update you'll be able to specify more settings but, for now you may be limited.
 
-Once you've saved these settings, Sunshine will now encode your game using your specific settings, enabling you to stream at potentially higher framerates, or framerates with higher 1% lows than before. (Author was not able to get higher than 4K@90 with default settings in Sunshine and Nvidia's GameStreaming service, but with the findings from this tool, is able to get stable 4K@120).
+Once you've saved these settings, Sunshine will now encode your game using your specific settings, enabling you to
+stream at potentially higher framerates, or framerates with higher 1% lows than before. (Author was not able to get
+higher than 4K@90 with default settings in Sunshine and Nvidia's GameStreaming service, but with the findings from this
+tool, is able to get stable 4K@120).
 
 ### Applying Bitrate Knowledge in Moonlight App
 
 When using Moonlight as your game streaming client, it auto-recommends a bitrate for you to stream at. Most of the time
 this is pretty accurate for lower resolutions, however depending on your hardware's capabilities you might be able to
-get away with less bitrate than it suggests. Even moreso, some AMD GPU's need way more bitrate than Nvidia cards, so you'll want to know if you'll need much higher bitrates.
+get away with less bitrate than it suggests. Even moreso, some AMD GPU's need way more bitrate than Nvidia cards, so
+you'll want to know if you'll need much higher bitrates.
 
 For example: Moonlight auto-selects `80Mb/s` for streaming 4K@60 game content. However from our testing, you really only
-need `50Mb/s` when encoding using H264_NVENC. Notice that this applies to _nvenc_ encoders on Nvidia GPU's, and may or may not apply for other vendor GPU's, even using the same H264 algorithm.
+need `50Mb/s` when encoding using H264_NVENC. Notice that this applies to _nvenc_ encoders on Nvidia GPU's, and may or
+may not apply for other vendor GPU's, even using the same H264 algorithm.
 
-After running the tool on a 4K@60 input file, we know we can get a visually lossless streaming experience with just 50Mb/s on our Nvidia GPU. We also know that, if we are attempting to stream our games outside our home network, we know that our cellular connection speeds or wifi speeds should be at least 50Mb/s to get a clean 4K@60. In addition to this, our gaming rig (and home network upload speeds) should also be capable of 50Mb/s.
+After running the tool on a 4K@60 input file, we know we can get a visually lossless streaming experience with just
+50Mb/s on our Nvidia GPU. We also know that, if we are attempting to stream our games outside our home network, we know
+that our cellular connection speeds or wifi speeds should be at least 50Mb/s to get a clean 4K@60. In addition to this,
+our gaming rig (and home network upload speeds) should also be capable of 50Mb/s.
 
-The tools here enable you to know whether you can actually stream to where you are, or if you are bitrate limited, encoder hardware limited, or somewhere in-between. It's easier to know if you can stream games to your phone while on cellular data, and know what resolution & framerate to set your stream to given that you are bitrate limited.
+The tools here enable you to know whether you can actually stream to where you are, or if you are bitrate limited,
+encoder hardware limited, or somewhere in-between. It's easier to know if you can stream games to your phone while on
+cellular data, and know what resolution & framerate to set your stream to given that you are bitrate limited.
 
 ### Streaming with OBS Studio
 
@@ -276,7 +306,9 @@ TBD
 ## Author's Research Findings and Discussion
 
 A _lot_ of research has gone into the development of this tool, and some decisions were made along the way that might
-not be obvious to why some conclusions were drawn. This section is also for you if you are interested in some nitty-gritty details of video encoding, from SSD i/o read speed limitations, framerate statistics, and some design decisions of the tool made by the author during development.
+not be obvious to why some conclusions were drawn. This section is also for you if you are interested in some
+nitty-gritty details of video encoding, from SSD i/o read speed limitations, framerate statistics, and some design
+decisions of the tool made by the author during development.
 
 ### Streaming Host & Client Software Suggestions
 
