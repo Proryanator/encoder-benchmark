@@ -105,6 +105,11 @@ impl FfmpegArgs {
         return output;
     }
 
+    pub fn set_no_output_for_error(&mut self) {
+        self.output_args = NO_OUTPUT.to_string();
+        self.send_progress = false;
+    }
+
     pub fn to_vec(&self) -> Vec<String> {
         return self.to_string().split(" ").map(|s| s.to_string()).collect();
     }

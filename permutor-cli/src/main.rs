@@ -75,6 +75,7 @@ fn build_nvenc_setting_permutations(engine: &mut PermutationEngine, cli: &Permut
         permutation.verbose = cli.verbose;
         permutation.detect_overload = cli.detect_overload;
         permutation.allow_duplicates = cli.allow_duplicate_scores;
+        permutation.verbose = cli.verbose;
         engine.add(permutation);
 
         // break out early here to just make 1 permutation

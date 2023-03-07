@@ -74,25 +74,48 @@ fn log_header(index: usize, permutations: &Vec<Permutation>, calc_time: Option<D
     println!("[{}]", permutation.encoder_settings);
 }
 
-pub fn spawn_ffmpeg_child(ffmpeg_args: &FfmpegArgs) -> Child {
-    return Command::new("ffmpeg")
-        .args(ffmpeg_args.to_vec())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn().expect("Failed to start instance of ffmpeg");
+pub fn spawn_ffmpeg_child(ffmpeg_args: &FfmpegArgs, verbose: bool, log_error_output: Option<bool>) -> Child {
+    // log the full ffmpeg command to be spawned
+    if verbose {
+        println!("V: ffmpeg args: {:?}", ffmpeg_args.encoder_args);
+        let mut cloned = ffmpeg_args.clone();
+        cloned.set_no_output_for_error();
+        println!("V: ffmpeg args no network calls (copy this and run locally, minus the quotes): {:?}", cloned.encoder_args);
+    }
+
+    let mut effective_ffmpeg_args = ffmpeg_args.clone();
+    if log_error_output.is_some() && log_error_output.unwrap() {
+        effective_ffmpeg_args.set_no_output_for_error();
+    }
+
+    let mut command = Command::new("ffmpeg");
+    let child = command.args(effective_ffmpeg_args.to_vec());
+
+    if log_error_output.is_some() && log_error_output.unwrap() {
+        child.stdout(Stdio::inherit())
+            .stderr(Stdio::inherit());
+    } else {
+        child.stdout(Stdio::null())
+            .stderr(Stdio::null());
+    }
+
+    return child.spawn().expect("Failed to start instance of ffmpeg");
 }
 
 fn run_overload_benchmark(metadata: &MetaData, ffmpeg_args: &FfmpegArgs, verbose: bool, detect_overload: bool, ctrl_channel: &Result<Receiver<()>, Error>) -> TrialResult {
-    let mut child = spawn_ffmpeg_child(ffmpeg_args);
+    let mut child = spawn_ffmpeg_child(ffmpeg_args, verbose, None);
     if verbose {
-        println!("Successfully spawned encoding child")
+        println!("V: Successfully spawned encoding child");
     }
 
     let trial_result = progressbar::watch_encode_progress(metadata.frames, detect_overload, metadata.fps, verbose, ffmpeg_args.stats_period, ctrl_channel);
 
     if trial_result.ffmpeg_error && !was_ctrl_c_received(&ctrl_channel) {
         let _ = child.kill();
-        println!("Ffmpeg encountered an error when attempting to run, double-check that your environment is setup correctly. If so, open an issue in github!");
+        eprintln!("Ffmpeg encountered an error when attempting to run, double-check that your environment is setup correctly. If so, open an issue in github!");
+        // spawn the ffmpeg command, with output logged so we can troubleshoot better
+        // modifying the command just a little bit so that it fails immediately
+        spawn_ffmpeg_child(&ffmpeg_args, verbose, Option::from(true));
     } else if trial_result.was_overloaded && !was_ctrl_c_received(&ctrl_channel) {
         let _ = child.kill();
         println!("Encoder was overloaded and could not encode the video file in realtime, stopping...");

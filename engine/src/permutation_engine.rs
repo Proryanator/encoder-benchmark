@@ -65,7 +65,7 @@ impl PermutationEngine {
 
             if !result.was_overloaded && permutation.check_quality.clone() {
                 let vmaf_start_time = SystemTime::now();
-                result.vmaf_score = check_encode_quality(permutation.clone(), &ctrl_channel);
+                result.vmaf_score = check_encode_quality(permutation.clone(), &ctrl_channel, permutation.verbose);
                 result.vmaf_calculation_time = vmaf_start_time.elapsed().unwrap().as_secs();
 
                 // if this is higher than the target quality, stop at this bitrate during benchmark
@@ -122,7 +122,7 @@ impl PermutationEngine {
     }
 }
 
-fn check_encode_quality(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>) -> c_float {
+fn check_encode_quality(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>, verbose: bool) -> c_float {
     let ffmpeg_args = FfmpegArgs::build_ffmpeg_args(p.video_file.clone(), p.encoder.clone(), &p.encoder_settings, p.bitrate.clone());
 
     println!("Calculating vmaf score; might take longer than original encode depending on your CPU...");
@@ -131,10 +131,10 @@ fn check_encode_quality(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, 
     // first spawn the ffmpeg instance to listen for incoming encode
     let vmaf_args = ffmpeg_args.map_to_vmaf(metadata.fps);
     if p.verbose {
-        println!("Vmaf args calculating quality: {}", vmaf_args.to_string());
+        println!("V: Vmaf args calculating quality: {}", vmaf_args.to_string());
     }
 
-    let mut vmaf_child = spawn_ffmpeg_child(&vmaf_args);
+    let mut vmaf_child = spawn_ffmpeg_child(&vmaf_args, verbose, None);
 
     // then spawn the ffmpeg instance to perform the encoding
     let mut encoder_args = ffmpeg_args.clone();
@@ -142,10 +142,10 @@ fn check_encode_quality(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, 
     encoder_args.output_args = String::from(insert_format_from(TCP_OUTPUT, &ffmpeg_args.encoder));
 
     if p.verbose {
-        println!("Encoder fmmpeg args sending to vmaf: {}", encoder_args.to_string());
+        println!("V: Encoder fmmpeg args sending to vmaf: {}", encoder_args.to_string());
     }
 
-    spawn_ffmpeg_child(&encoder_args);
+    spawn_ffmpeg_child(&encoder_args, verbose, None);
 
     // not the cleanest way to do this but oh well
     progressbar::watch_encode_progress(metadata.frames, false, metadata.fps, false, ffmpeg_args.stats_period, ctrl_channel);
