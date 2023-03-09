@@ -1,6 +1,6 @@
 use std::ffi::c_float;
 
-pub static TCP_LISTEN: &str = "tcp://127.0.0.1:2000?listen";
+pub static TCP_LISTEN: &str = "tcp://localhost:2000?listen";
 pub static NO_OUTPUT: &str = "-f null -";
 
 #[derive(Clone)]
@@ -72,7 +72,7 @@ impl FfmpegArgs {
 
         // not all will want to send progress
         if self.send_progress {
-            output.push_str(format!("-progress tcp://127.0.0.1:1234 -stats_period {} ", self.stats_period).as_str());
+            output.push_str(format!("-progress tcp://localhost:1234 -stats_period {} ", self.stats_period).as_str());
         }
 
         if self.report {
@@ -198,14 +198,14 @@ mod tests {
     #[test]
     fn to_string_one_input_test() {
         assert_eq!(get_one_input_args().to_string(),
-                   "-progress tcp://127.0.0.1:1234 -stats_period 0.5 -i 1080-60.y4m -b:v 6M -c:v h264_nvenc -preset hq -tune hq -profile:v high -rc cbr -multipass qres -rc-lookahead 8 -f null -"
+                   "-progress tcp://localhost:1234 -stats_period 0.5 -i 1080-60.y4m -b:v 6M -c:v h264_nvenc -preset hq -tune hq -profile:v high -rc cbr -multipass qres -rc-lookahead 8 -f null -"
         );
     }
 
     #[test]
     fn to_string_two_input_test() {
         assert_eq!(get_two_input_args().to_string(),
-                   "-progress tcp://127.0.0.1:1234 -stats_period 0.5 -i 1080-60.y4m -i 1080-60-2.y4m -b:v 6M -c:v h264_nvenc -preset hq -tune hq -profile:v high -rc cbr -multipass qres -rc-lookahead 8 -f null -"
+                   "-progress tcp://localhost:1234 -stats_period 0.5 -i 1080-60.y4m -i 1080-60-2.y4m -b:v 6M -c:v h264_nvenc -preset hq -tune hq -profile:v high -rc cbr -multipass qres -rc-lookahead 8 -f null -"
         );
     }
 
@@ -227,7 +227,7 @@ mod tests {
     fn map_to_vmaf_to_string_test() {
         let vmaf_args = get_two_input_args().map_to_vmaf(FPS_LIMIT);
         assert_eq!(vmaf_args.to_string(),
-                   format!("-report -r {} -i tcp://127.0.0.1:2000?listen -r {} -i 1080-60.y4m -filter_complex libvmaf='n_threads={}:n_subsample=5' -f null -", FPS_LIMIT, FPS_LIMIT, num_cpus::get().to_string())
+                   format!("-report -r {} -i tcp://localhost:2000?listen -r {} -i 1080-60.y4m -filter_complex libvmaf='n_threads={}:n_subsample=5' -f null -", FPS_LIMIT, FPS_LIMIT, num_cpus::get().to_string())
         );
     }
 

@@ -77,10 +77,10 @@ fn log_header(index: usize, permutations: &Vec<Permutation>, calc_time: Option<D
 pub fn spawn_ffmpeg_child(ffmpeg_args: &FfmpegArgs, verbose: bool, log_error_output: Option<bool>) -> Child {
     // log the full ffmpeg command to be spawned
     if verbose {
-        println!("V: ffmpeg args: {:?}", ffmpeg_args.encoder_args);
+        println!("V: ffmpeg args: [{}]", ffmpeg_args.to_string());
         let mut cloned = ffmpeg_args.clone();
         cloned.set_no_output_for_error();
-        println!("V: ffmpeg args no network calls (copy this and run locally, minus the quotes): {:?}", cloned.encoder_args);
+        println!("V: ffmpeg args no network calls (copy this and run locally, minus the quotes): [{}]", cloned.to_string());
     }
 
     let mut effective_ffmpeg_args = ffmpeg_args.clone();

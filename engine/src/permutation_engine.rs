@@ -17,7 +17,7 @@ use crate::progressbar::draw_yellow_bar;
 use crate::result::{log_results_to_file, PermutationResult};
 use crate::threads::setup_ctrl_channel;
 
-pub static TCP_OUTPUT: &str = "-f {} tcp://127.0.0.1:2000";
+pub static TCP_OUTPUT: &str = "-f {} tcp://localhost:2000";
 
 // the hard-coded vmaf quality we want to shoot for when doing bitrate permutations
 const TARGET_QUALITY: c_float = 95.0;

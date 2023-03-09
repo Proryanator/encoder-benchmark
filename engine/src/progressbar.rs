@@ -28,6 +28,11 @@ impl Default for TrialResult {
 }
 
 pub fn watch_encode_progress(total_frames: u64, detect_overload: bool, target_fps: u32, verbose: bool, stats_period: c_float, ctrl_channel: &Result<Receiver<()>, Error>) -> TrialResult {
+    // set this flag every second to see real-time fps statistics and other information
+    let mut can_log_verbose = true;
+    let verbose_log_interval = time::Duration::from_secs(1);
+    let mut log_verbose_timer = SystemTime::now();
+
     static FRAME: AtomicUsize = AtomicUsize::new(0);
     static PREVIOUS_FRAME: AtomicUsize = AtomicUsize::new(0);
 
@@ -53,12 +58,22 @@ pub fn watch_encode_progress(total_frames: u64, detect_overload: bool, target_fp
     let stat_listener = start_listening_to_ffmpeg_stats(verbose, &FRAME, &PREVIOUS_FRAME);
 
     let mut last_frame = 0;
+
     loop {
+        if log_verbose_timer.elapsed().unwrap() > verbose_log_interval {
+            log_verbose_timer = SystemTime::now();
+            can_log_verbose = true;
+        }
+
         // important to not get stuck in this thread
         exit_on_ctrl_c(&ctrl_channel);
 
         // takes into account the stat update period to properly adjust the calculated FPS
         let calculated_fps = ((FRAME.load(Ordering::Relaxed) - PREVIOUS_FRAME.load(Ordering::Relaxed)) * interval_adjustment) as u16;
+
+        if verbose && can_log_verbose {
+            println!("V: Calculated fps: {}", calculated_fps);
+        }
 
         // only record fps counts that are close to 1/4 of the target; any lower is noise
         if calculated_fps >= (target_fps / 4) as u16 {
@@ -103,6 +118,11 @@ pub fn watch_encode_progress(total_frames: u64, detect_overload: bool, target_fp
                 trial_result.ffmpeg_error = true;
                 break;
             }
+        }
+
+        // always toggle off the verbose logger
+        if can_log_verbose {
+            can_log_verbose = false;
         }
     }
 
