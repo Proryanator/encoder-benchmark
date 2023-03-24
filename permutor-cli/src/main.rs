@@ -2,6 +2,7 @@ use clap::Parser;
 
 use codecs::amf::Amf;
 use codecs::get_vendor_for_codec;
+use codecs::intel_igpu::IntelIGPU;
 use codecs::nvenc::Nvenc;
 use codecs::permute::Permute;
 use codecs::vendor::Vendor;
@@ -27,6 +28,9 @@ fn main() {
             }
             Vendor::AMD => {
                 build_amf_setting_permutations(&mut engine, &cli, bitrate);
+            }
+            Vendor::InteliGPU => {
+                build_intel_igpu_permutations(&mut engine, &cli, bitrate);
             }
             Vendor::Unknown => {}
         }
@@ -92,6 +96,30 @@ fn build_amf_setting_permutations(engine: &mut PermutationEngine, cli: &Permutor
     amf.init();
 
     while let Some((_encoder_index, settings)) = amf.next() {
+        let mut permutation = Permutation::new(cli.source_file.clone(), cli.encoder.clone());
+        permutation.video_file = cli.source_file.clone();
+        permutation.encoder_settings = settings;
+        permutation.bitrate = bitrate;
+        permutation.check_quality = cli.check_quality;
+        permutation.verbose = cli.verbose;
+        permutation.detect_overload = cli.detect_overload;
+        permutation.allow_duplicates = cli.allow_duplicate_scores;
+        engine.add(permutation);
+
+        // break out early here to just make 1 permutation
+        if cli.test_run {
+            break;
+        }
+    }
+}
+
+fn build_intel_igpu_permutations(engine: &mut PermutationEngine, cli: &PermutorCli, bitrate: u32) {
+    let mut intel_i_gpu = IntelIGPU::new(cli.encoder == "hevc_qsv");
+
+    // initialize the permutations each time
+    intel_i_gpu.init();
+
+    while let Some((_encoder_index, settings)) = intel_i_gpu.next() {
         let mut permutation = Permutation::new(cli.source_file.clone(), cli.encoder.clone());
         permutation.video_file = cli.source_file.clone();
         permutation.encoder_settings = settings;
