@@ -10,6 +10,7 @@ use cli::cli_util::{is_dev, pause};
 use cli::supported::{get_supported_encoders, get_supported_inputs};
 use codecs::amf::Amf;
 use codecs::get_vendor_for_codec;
+use codecs::intel_igpu::IntelIGPU;
 use codecs::nvenc::Nvenc;
 use codecs::permute::Permute;
 use codecs::vendor::Vendor;
@@ -177,8 +178,13 @@ fn get_benchmark_settings_for(cli: &BenchmarkCli) -> String {
         }
 
         Vendor::AMD => {
-            let amf = Amf::new(cli.encoder == "hevc_nvenc", cli.gpu);
+            let amf = Amf::new(cli.encoder == "hevc_amf", cli.gpu);
             amf.get_benchmark_settings()
+        }
+
+        Vendor::InteliGPU => {
+            let intel_qsv = IntelIGPU::new(cli.encoder == "hevc_qsv");
+            intel_qsv.get_benchmark_settings()
         }
         Vendor::Unknown => {
             // nothing to do here

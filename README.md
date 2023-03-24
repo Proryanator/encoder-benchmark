@@ -3,6 +3,7 @@
 ### Contents
 
 - [Overview](#overview)
+- [Supported Encoders](#supported-encoders)
 - [Minimum System Specs Suggested](#minimum-system-specs-suggested)
 - [Installation and Setup](#installation-and-setup)
 - [Benchmark Tool Quick Run Guide](#benchmark-tool-quick-run-guide)
@@ -45,6 +46,14 @@ are curious about emerging GPU encoder performance that has not yet been researc
 that you would have to do on your own by hand. (People often do this in OBS Studio **by hand** to see how much quality
 they can squeeze out of 1080@60 H264 @ 6Mb/s, and when determining whether their GPU can even stream at very high
 resolutions and framerates).
+
+## Supported Encoders
+
+- **Nvidia NVENC H264/HEVC** (h264_nvenc, hevc_nvenc)
+- **AMD H264/HEVC** (h264_amf, hevc_amf)
+- **Intel Quick Sync Video H264/HEVC** (h264_qsv, hevc_qsv)
+
+Note, no support for software/CPU encoding or AV1 hardware encoding exists yet.
 
 ## Minimum system specs suggested
 
@@ -299,7 +308,26 @@ cellular data, and know what resolution & framerate to set your stream to given 
 
 ### Streaming with OBS Studio
 
-TBD
+For the most part, if the encoder that you're interested in using to stream with is supported in OBS Studio, you'll be
+able to apply the settings identified that product the highest FPS or highest quality of a stream at a given bitrate
+directly in OBS Studio's Settings -> Output area like you normally would.
+
+For example, you can just set the preset, profile, and tune if you are Streaming/Recording using OBS Studio:
+
+![img.png](docs/obs-simple-encoder-example.png)
+
+With the use of a very useful plugin called <a href='https://github.com/Xaymar/obs-StreamFX'>StreamFX</a> you can gain
+access to passing in even more encoder settings via the UI, in addition to passing arguments directly to ffmpeg itself
+as well.
+
+If use of the standard preset, tune, and profile settings are not granular enough for you, you can always mess with
+additional settings via this plugin:
+
+![img.png](docs/streamfx-example.png)
+
+**Note:** there most likely will be a performance hit when applying the same settings that you saw from use of the tools
+in this project. This is due to some potential overhead in the way that OBS Studio does encoding but, you should be able
+to get very close to the performance/quality that the tools here identify.
 
 ---
 
