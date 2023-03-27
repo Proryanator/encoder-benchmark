@@ -12,6 +12,10 @@ pub struct Permutation {
     pub allow_duplicates: bool,
     pub detect_overload: bool,
     pub verbose: bool,
+    // determines whether this permutation is the decode run or not
+    pub decode_run: bool,
+    // whether we are doing any decoding at all
+    pub is_decoding: bool,
 }
 
 impl Permutation {
@@ -26,6 +30,8 @@ impl Permutation {
             allow_duplicates: false,
             detect_overload: false,
             verbose: false,
+            decode_run: false,
+            is_decoding: false,
         }
     }
 

@@ -56,7 +56,19 @@ fn main() {
         permutation.bitrate = bitrate;
         permutation.encoder_settings = settings;
         permutation.verbose = cli.verbose;
-        engine.add(permutation);
+
+        // tell this encode run that we'll want to preserve the file output
+        if cli.decode {
+            permutation.is_decoding = true;
+        }
+
+        engine.add(permutation.clone());
+
+        if cli.decode {
+            let mut decode_permutation = permutation.clone();
+            decode_permutation.decode_run = true;
+            engine.add(decode_permutation);
+        }
     }
 
     engine.run();
@@ -104,6 +116,20 @@ fn read_user_input(cli: &mut BenchmarkCli, gpus: Vec<String>) {
                 cli.encoder = String::from(get_supported_encoders()[value]);
                 break;
             }
+        }
+    }
+
+    loop {
+        print!("\nRun decode benchmark along with encode benchmark? [y/n]: ");
+        let full: String = read!("{}");
+        if full != "n" && full != "y" {
+            println!("Invalid input, try again...");
+        } else {
+            if full == "y" {
+                cli.decode = true;
+            }
+
+            break;
         }
     }
 

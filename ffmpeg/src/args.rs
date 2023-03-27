@@ -1,5 +1,8 @@
 use std::ffi::c_float;
 
+use codecs::get_vendor_for_codec;
+use codecs::vendor::Vendor;
+
 pub static TCP_LISTEN: &str = "tcp://localhost:2000?listen";
 pub static NO_OUTPUT: &str = "-f null -";
 
@@ -8,7 +11,7 @@ pub struct FfmpegArgs {
     fps_limit: u32,
     report: bool,
     send_progress: bool,
-    first_input: String,
+    pub first_input: String,
     second_input: String,
     pub bitrate: u32,
     pub encoder: String,
@@ -16,6 +19,7 @@ pub struct FfmpegArgs {
     pub output_args: String,
     pub is_vmaf: bool,
     pub stats_period: c_float,
+    pub decode: bool,
 }
 
 impl Default for FfmpegArgs {
@@ -34,17 +38,19 @@ impl Default for FfmpegArgs {
             // the lower the value, the more often the progress bar will update
             // but your fps calculations might be a little over-inflated
             stats_period: 0.5,
+            decode: false,
         }
     }
 }
 
 impl FfmpegArgs {
-    pub fn build_ffmpeg_args(first_input: String, encoder: String, encoder_args: &String, current_bitrate: u32) -> FfmpegArgs {
+    pub fn build_ffmpeg_args(first_input: String, encoder: String, encoder_args: &String, current_bitrate: u32, decode: bool) -> FfmpegArgs {
         let ffmpeg_args = FfmpegArgs {
             first_input,
             bitrate: current_bitrate,
             encoder,
             encoder_args: encoder_args.to_string(),
+            decode,
             ..Default::default()
         };
 
@@ -75,6 +81,23 @@ impl FfmpegArgs {
             output.push_str(format!("-progress tcp://localhost:1234 -stats_period {} ", self.stats_period).as_str());
         }
 
+        // always pass the '-y' flag, for output to be overwritten
+        output.push_str("-y ");
+
+        if self.decode {
+            let vendor = get_vendor_for_codec(&self.encoder);
+            let hwaccel = match vendor {
+                Vendor::Nvidia => "cuda",
+                Vendor::AMD => "d3d11va",
+                Vendor::InteliGPU => "qsv",
+                Vendor::Unknown => "error"
+            };
+
+            output.push_str("-hwaccel ");
+            output.push_str(hwaccel);
+            output.push_str(" ");
+        }
+
         if self.report {
             output.push_str("-report ");
         }
@@ -93,16 +116,39 @@ impl FfmpegArgs {
             output.push_str([" -i", self.second_input.as_str()].join(" ").as_str());
         }
 
-        if self.is_vmaf {
-            append_vmaf_only_args(&mut output);
-        } else {
-            append_encode_only_args(&mut output, self.bitrate, &self.encoder, &self.encoder_args);
+        // only apply these if we're not decoding
+        if !self.decode {
+            if self.is_vmaf {
+                append_vmaf_only_args(&mut output);
+            } else {
+                append_encode_only_args(&mut output, self.bitrate, &self.encoder, &self.encoder_args);
+            }
         }
 
         output.push(' ');
         output.push_str(self.output_args.as_str());
 
         return output;
+    }
+
+    pub fn setup_decode_output(&mut self) {
+        let splits = self.first_input.split("y4m").collect::<Vec<&str>>();
+        // we'll probably want to change the file extension at some point but, .mp4 is fine for now
+        let file_prefix = splits.get(0).unwrap();
+        let mut output = String::from("");
+        output.push_str(file_prefix);
+        output.push_str("mp4");
+        self.output_args = output;
+    }
+
+    pub fn setup_decode_input(&mut self) {
+        let splits = self.first_input.split("y4m").collect::<Vec<&str>>();
+        // we'll probably want to change the file extension at some point but, .mp4 is fine for now
+        let file_prefix = splits.get(0).unwrap();
+        let mut output = String::from("");
+        output.push_str(file_prefix);
+        output.push_str("mp4");
+        self.first_input = output;
     }
 
     pub fn set_no_output_for_error(&mut self) {
@@ -198,14 +244,14 @@ mod tests {
     #[test]
     fn to_string_one_input_test() {
         assert_eq!(get_one_input_args().to_string(),
-                   "-progress tcp://localhost:1234 -stats_period 0.5 -i 1080-60.y4m -b:v 6M -c:v h264_nvenc -preset hq -tune hq -profile:v high -rc cbr -multipass qres -rc-lookahead 8 -f null -"
+                   "-progress tcp://localhost:1234 -stats_period 0.5 -y -i 1080-60.y4m -b:v 6M -c:v h264_nvenc -preset hq -tune hq -profile:v high -rc cbr -multipass qres -rc-lookahead 8 -f null -"
         );
     }
 
     #[test]
     fn to_string_two_input_test() {
         assert_eq!(get_two_input_args().to_string(),
-                   "-progress tcp://localhost:1234 -stats_period 0.5 -i 1080-60.y4m -i 1080-60-2.y4m -b:v 6M -c:v h264_nvenc -preset hq -tune hq -profile:v high -rc cbr -multipass qres -rc-lookahead 8 -f null -"
+                   "-progress tcp://localhost:1234 -stats_period 0.5 -y -i 1080-60.y4m -i 1080-60-2.y4m -b:v 6M -c:v h264_nvenc -preset hq -tune hq -profile:v high -rc cbr -multipass qres -rc-lookahead 8 -f null -"
         );
     }
 
@@ -227,7 +273,7 @@ mod tests {
     fn map_to_vmaf_to_string_test() {
         let vmaf_args = get_two_input_args().map_to_vmaf(FPS_LIMIT);
         assert_eq!(vmaf_args.to_string(),
-                   format!("-report -r {} -i tcp://localhost:2000?listen -r {} -i 1080-60.y4m -filter_complex libvmaf='n_threads={}:n_subsample=5' -f null -", FPS_LIMIT, FPS_LIMIT, num_cpus::get().to_string())
+                   format!("-y -report -r {} -i tcp://localhost:2000?listen -r {} -i 1080-60.y4m -filter_complex libvmaf='n_threads={}:n_subsample=5' -f null -", FPS_LIMIT, FPS_LIMIT, num_cpus::get().to_string())
         );
     }
 
@@ -245,7 +291,7 @@ mod tests {
             list_supported_encoders: false,
         };
 
-        return FfmpegArgs::build_ffmpeg_args(args.source_file, args.encoder, &ENCODER_ARGS.to_string(), args.bitrate);
+        return FfmpegArgs::build_ffmpeg_args(args.source_file, args.encoder, &ENCODER_ARGS.to_string(), args.bitrate, false);
     }
 
     fn get_two_input_args() -> FfmpegArgs {

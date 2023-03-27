@@ -20,10 +20,11 @@ pub struct PermutationResult {
     pub vmaf_calculation_time: u64,
     pub vmaf_score: c_float,
     pub fps_stats: FpsStats,
+    pub decode_run: bool,
 }
 
 impl PermutationResult {
-    pub fn new(metadata: &MetaData, bitrate: u32, encoder_settings: &String, encoder: &str) -> Self {
+    pub fn new(metadata: &MetaData, bitrate: u32, encoder_settings: &String, encoder: &str, decode: bool) -> Self {
         Self {
             encoder: String::from(encoder),
             was_overloaded: false,
@@ -34,6 +35,7 @@ impl PermutationResult {
             vmaf_calculation_time: 0,
             vmaf_score: 0.0,
             fps_stats: FpsStats::default(),
+            decode_run: decode,
         }
     }
 
@@ -47,9 +49,16 @@ impl PermutationResult {
         // adjust tabs based on expected vmaf score, or lack of one
         let vmaf_score_str = if self.was_overloaded { format!("{:.5}\t\t", self.vmaf_score) } else if self.vmaf_score != 0.0 { format!("{:.5}\t", self.vmaf_score) } else { format!("0.00000\t\t") };
 
+        let effective_settings;
+        if self.decode_run {
+            effective_settings = String::from("(Decode)");
+        } else {
+            effective_settings = self.encoder_settings.clone()
+        }
+
         default.push_str(format!("\t\t{}\t\t{}\t\t{}{:.0}\t\t{}\t\t{}\t\t{}",
                                  format_dhms(self.encode_time), format_dhms(self.vmaf_calculation_time), vmaf_score_str,
-                                 self.fps_stats.avg, self.fps_stats.one_perc_low, self.fps_stats.ninety_perc, self.encoder_settings).as_str());
+                                 self.fps_stats.avg, self.fps_stats.one_perc_low, self.fps_stats.ninety_perc, effective_settings).as_str());
 
         return default;
     }
@@ -67,7 +76,12 @@ pub fn log_results_to_file(results: Vec<PermutationResult>, runtime_str: &String
 
     writeln!(&mut w, "Results from entire permutation:").unwrap();
     writeln!(&mut w, "==================================================================================================================================================================").unwrap();
-    writeln!(&mut w, "   [Resolution]\t[FPS]\t[Bitrate]\t[Encode Time]\t[VMAF Time]\t[VMAF Score]\t[Average FPS]\t[1%'ile]\t[90%'ile]\t[Encoder Settings]").unwrap();
+    let mut time = "[Encode Time]";
+    if results.len() > 1 && results[1].decode_run {
+        time = "[Encode/Decode Time]"
+    }
+
+    writeln!(&mut w, "   [Resolution]\t[FPS]\t[Bitrate]\t{}\t[VMAF Time]\t[VMAF Score]\t[Average FPS]\t[1%'ile]\t[90%'ile]\t[Encoder Settings]", time).unwrap();
     let mut current_bitrate = 0;
 
     for result in &results {
