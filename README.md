@@ -49,8 +49,11 @@ resolutions and framerates).
 
 ## Supported Encoders
 
-- **Nvidia NVENC H264/HEVC** (h264_nvenc, hevc_nvenc)
-- **AMD H264/HEVC** (h264_amf, hevc_amf)
+Note: encoders marked with a <b>*</b> support benchmarking of encoding/decoding capabilities; otherwise only encoding is
+supported.
+
+- ***Nvidia NVENC H264/HEVC** (h264_nvenc, hevc_nvenc)
+- ***AMD H264/HEVC** (h264_amf, hevc_amf)
 - **Intel Quick Sync Video H264/HEVC** (h264_qsv, hevc_qsv)
 
 Note, no support for software/CPU encoding or AV1 hardware encoding exists yet.
@@ -62,6 +65,7 @@ Note, no support for software/CPU encoding or AV1 hardware encoding exists yet.
 - <b>GPU:</b> Nvidia GPU w/ a hardware encoder, in the main x16 PCI slot of your PC (for max PCI bandwidth)
 - <b>Memory:</b> >= 8GB RAM (higher is always better)
 - <b>Storage Space:</b> 3-12GB depending on target resolution/framerate, 90GB for the full benchmark
+- <b>Extra Space:</b> When running encode & decode benchmark, allow for 12GB of additional free space (on top of 90GB)
 - <b>Storage Type/Speed:</b>
     - if benchmarking <= 2k@60, any SATA SSD will work just fine
     - if benchmarking >= 2k@120, you MUST use an m.2 nvme drive with speeds upwards of 1.1GB/s
@@ -123,6 +127,7 @@ benchmark is as simple as:
 - select your GPU (if you have more than 1, otherwise it auto-selects your only
   card)
 - select your encoder
+- select whether you want to benchmark encoding & decoding, or just encoding
 - select whether to run the benchmark on all resolutions or just a specific one
 - select whether you want to run it in verbose mode for extra logging (useful for error debugging)
 

@@ -10,3 +10,4 @@ num_cpus = "1.15.0"
 filetime = "0.2.19"
 regex = "1.7.0"
 rev_buf_reader = "0.3.0"
+codecs = { path = "../codecs" }

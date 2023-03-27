@@ -1,5 +1,7 @@
 use std::ffi::c_float;
+use std::fs;
 use std::process::{Child, Command, Stdio};
+use std::thread::sleep;
 use std::time::{Duration, SystemTime};
 
 use compound_duration::format_dhms;
@@ -17,13 +19,23 @@ use crate::result::PermutationResult;
 use crate::threads::was_ctrl_c_received;
 
 pub fn run_encode(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>) -> PermutationResult {
-    let mut result = PermutationResult::new(&p.get_metadata(), p.bitrate, &p.encoder_settings, &p.encoder);
+    println!("Result will be stored for {}", p.decode_run);
+    let mut result = PermutationResult::new(&p.get_metadata(), p.bitrate, &p.encoder_settings, &p.encoder, p.decode_run);
 
     let metadata = p.get_metadata();
 
-    let ffmpeg_args = FfmpegArgs::build_ffmpeg_args(p.video_file, p.encoder, &p.encoder_settings, p.bitrate);
+    let mut ffmpeg_args = FfmpegArgs::build_ffmpeg_args(p.video_file, p.encoder, &p.encoder_settings, p.bitrate, p.decode_run);
 
     let encode_start_time = SystemTime::now();
+
+    if p.is_decoding {
+        if p.decode_run {
+            // swap the input file for the output made from before
+            ffmpeg_args.setup_decode_input()
+        } else {
+            ffmpeg_args.setup_decode_output()
+        }
+    }
 
     // not sure what to do about these results here
     let mut trial_result = run_overload_benchmark(&metadata, &ffmpeg_args, p.verbose, p.detect_overload, &ctrl_channel);
@@ -44,6 +56,14 @@ pub fn run_encode(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>
     println!("  Average FPS:\t{:.0}", result.fps_stats.avg);
     println!("  1%'ile:\t{}", result.fps_stats.one_perc_low);
     println!("  90%'ile:\t{}\n", result.fps_stats.ninety_perc);
+
+    // delete the file we created to save on storage space
+    if p.decode_run {
+        // gives time for ffmpeg to release it's hold on the file
+        println!("Giving ffmpeg a change to let go of the decode file, hang tight...");
+        sleep(Duration::from_secs(5));
+        fs::remove_file(ffmpeg_args.first_input).expect("Not able to delete the file produced by the previous encode");
+    }
 
     return result;
 }
@@ -67,6 +87,14 @@ fn log_header(index: usize, permutations: &Vec<Permutation>, calc_time: Option<D
         }
     }
     println!("[Permutation:\t{}/{}]", index + 1, permutations.len());
+    if permutation.is_decoding {
+        if permutation.decode_run {
+            println!("[Decode Benchmark]");
+        } else {
+            println!("[Encode Benchmark]");
+        }
+    }
+
     println!("[Resolution:\t{}x{}]", metadata.width, metadata.height);
     println!("[Encoder:\t{}]", permutation.encoder);
     println!("[FPS:\t\t{}]", metadata.fps);

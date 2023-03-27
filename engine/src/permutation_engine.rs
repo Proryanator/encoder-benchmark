@@ -123,7 +123,7 @@ impl PermutationEngine {
 }
 
 fn check_encode_quality(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>, verbose: bool) -> c_float {
-    let ffmpeg_args = FfmpegArgs::build_ffmpeg_args(p.video_file.clone(), p.encoder.clone(), &p.encoder_settings, p.bitrate.clone());
+    let ffmpeg_args = FfmpegArgs::build_ffmpeg_args(p.video_file.clone(), p.encoder.clone(), &p.encoder_settings, p.bitrate.clone(), p.decode_run);
 
     println!("Calculating vmaf score; might take longer than original encode depending on your CPU...");
 

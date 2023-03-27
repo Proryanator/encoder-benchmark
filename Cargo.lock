@@ -338,6 +338,7 @@ dependencies = [
 name = "ffmpeg"
 version = "0.1.0"
 dependencies = [
+ "codecs",
  "filetime",
  "num_cpus",
  "regex",
