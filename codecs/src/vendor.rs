@@ -1,6 +1,6 @@
 pub enum Vendor {
     Nvidia,
     AMD,
-    InteliGPU,
+    IntelQSV,
     Unknown,
 }

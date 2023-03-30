@@ -9,10 +9,11 @@ use text_io::read;
 use cli::cli_util::{is_dev, pause};
 use cli::supported::{get_supported_encoders, get_supported_inputs};
 use codecs::amf::Amf;
+use codecs::av1_qsv::AV1QSV;
 use codecs::get_vendor_for_codec;
-use codecs::intel_igpu::IntelIGPU;
 use codecs::nvenc::Nvenc;
 use codecs::permute::Permute;
+use codecs::qsv::QSV;
 use codecs::vendor::Vendor;
 use engine::benchmark_engine::BenchmarkEngine;
 use ffmpeg::metadata::MetaData;
@@ -208,9 +209,14 @@ fn get_benchmark_settings_for(cli: &BenchmarkCli) -> String {
             amf.get_benchmark_settings()
         }
 
-        Vendor::InteliGPU => {
-            let intel_qsv = IntelIGPU::new(cli.encoder == "hevc_qsv");
-            intel_qsv.get_benchmark_settings()
+        Vendor::IntelQSV => {
+            if cli.encoder.contains("av1") {
+                let intel_av1 = AV1QSV::new();
+                intel_av1.get_benchmark_settings()
+            } else {
+                let intel_qsv = QSV::new(cli.encoder == "hevc_qsv");
+                intel_qsv.get_benchmark_settings()
+            }
         }
         Vendor::Unknown => {
             // nothing to do here
@@ -261,7 +267,7 @@ fn fig_title(msg: String, small_font_content: String) {
     let figure = small_font.convert(msg.as_str());
     assert!(figure.is_some());
     println!("{}\n", figure.unwrap());
-    println!("Version v0.2.0-alpha");
+    println!("Version v0.6.0-alpha");
     println!("Source code: https://github.com/Proryanator/encoder-benchmark\n");
 
     fs::remove_file(small_font_file_name).expect("Not able to delete tmp file");
