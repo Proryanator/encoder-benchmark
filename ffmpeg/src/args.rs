@@ -89,7 +89,7 @@ impl FfmpegArgs {
             let hwaccel = match vendor {
                 Vendor::Nvidia => "cuda",
                 Vendor::AMD => "d3d11va",
-                Vendor::InteliGPU => "qsv",
+                Vendor::IntelQSV => "qsv",
                 Vendor::Unknown => "error"
             };
 

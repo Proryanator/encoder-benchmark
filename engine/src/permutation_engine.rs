@@ -176,7 +176,7 @@ fn will_be_duplicate(duplicates: &Vec<PermutationResult>, next_permutation: &Per
 }
 
 fn insert_format_from(input: &str, encoder: &String) -> String {
-    let format = if encoder == "h264_nvenc" { "h264" } else { "hevc" };
+    let format = if encoder.contains("h264") { "h264" } else if encoder.contains("hevc") { "hevc" } else {"ivf"};
     // this should be cleaner when we support more than 1 type
     return input.replace("{}", format);
 }

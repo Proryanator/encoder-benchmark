@@ -12,6 +12,9 @@
 - [Applying your Findings](#applying-your-findings)
 - [Author's Research Findings and Discussion](#authors-research-findings-and-discussion)
 
+To see research outcomes for specific encoder types, please see [Encoder Specific Notes](#encoder-specific-notes) in
+the `Expected Performance` section.
+
 ## Overview
 
 ### Project Goals
@@ -55,8 +58,7 @@ supported.
 - ***Nvidia NVENC H264/HEVC** (h264_nvenc, hevc_nvenc)
 - ***AMD H264/HEVC** (h264_amf, hevc_amf)
 - **Intel Quick Sync Video H264/HEVC** (h264_qsv, hevc_qsv)
-
-Note, no support for software/CPU encoding or AV1 hardware encoding exists yet.
+- ***Intel Arc AV1** (av1_qsv)
 
 ## Minimum system specs suggested
 
@@ -86,13 +88,15 @@ PCI bottlenecking for GPU's not in the primary slot.
   free to have more than 1 for your testing (although the benchmark would only run against one)
 - the tool does _not_ support multiple AMD GPU's for the benchmark tool, but you are able to still specify _-gpu_ with
   the permutor-cli tool
+- for AV1 on Intel Arc, make sure the monitor plugged into the Arc GPU is your primary monitor, otherwise ffmpeg may not
+  use/pickup the GPU
 
 ---
 
 ## Installation and Setup
 
-Note: tool has been tested with ffmpeg version `5.1.2`, so it's highly suggested to use the same version, or at least
-version `5.*` of ffmpeg/ffprobe.
+Note: tool has been tested with ffmpeg version `6.0` (this version comes bundled with AV1 hardware encoding support), so
+it's highly suggested to use the same version, or at least version `6.*` of ffmpeg/ffprobe.
 
 1) Installation of <a href='https://ffmpeg.org/download.html'>ffmpeg</a>
 
@@ -566,6 +570,9 @@ performance benefit.
 
 ## Encoder Specific Notes
 
+- [H264/HEVC NVENC](#h264hevc-nvenc)
+- [AV1 Intel Arc](#av1-on-intel-arc)
+
 ### H264/HEVC NVENC
 
 #### Presets & Tunes
@@ -644,6 +651,59 @@ NVENC HEVC: 4K@60    -> 40-45Mb/s
 
 NVENC H264: 4K@120   -> 100Mb/s
 NVENC HEVC: 4K@120   -> 90-100Mb/s
+```
+
+---
+
+### AV1 on Intel Arc
+
+#### Presets
+
+Presets of `veryfast, faster, fast, medium, slow, slower, veryslow` are used in the tool. There may be varying degrees
+of quality increases from `veryfast` to `veryslow`, albeit with a maximum fps performance hit.
+
+Noticed not very much of a VMAF score increase between presets, between `veryfast` and `veryslow` there's ~2 points of a
+difference. It's recommended to stream using `veryfast` to get the most fps at relatively the same VMAF score.
+
+#### Profiles
+
+There were 2 profiles provided in the version of ffmpeg used by this tool: `main` and `unknown`. `unknown` is most
+likely a placeholder and produces similar results to `main`, so the tools will only use `main`.
+
+#### Async Depth
+
+This has to do with parallelism, and ffmpeg defaults to this being set to `4`. Any lower and you start to see pretty
+decent fps drops for realtime encoding performance. Any higher than `4` (tested up to `8`) there is negligible fps
+performance, gaining ~2fps or so in 1% lows.
+
+---
+
+## Expected Performance
+
+### Minimum Spec'd PC w/ AV1 Intel Arc GPU
+
+(No affiliate links in here, just for reference)
+
+- <b>
+  CPU:</b> <a href='https://www.intel.com/content/www/us/en/products/sku/126687/intel-core-i58400-processor-9m-cache-up-to-4-00-ghz/specifications.html'>
+  Intel i5-8400 (6 cores/6 threads)</a>
+- <b>RAM:</b> 16GB of <a href='https://a.co/d/0O1qryh'>G.Skill Ripjaws V DDR4 3200Mhz</a>
+- <b>GPU:</b> <a href='https://a.co/d/iJLdgKx'>Asus GTX 1660 Super</a>
+- <b>NVME SSD</b>: <a href='https://a.co/d/clUM7ta'>PNY250GB NVMe PCI Gen3 x4</a>
+- <b>Intel Arc GPU:</b> ASRock A380 6GB
+- <b>Intel Arc Driver:</b> 31.0.101.4255
+
+So far, the author did his testing at 4K@60, but as more resolutions get tested there will be more results below.
+
+```text
+720@60   -> ???
+720@120  -> ???
+1080@60  -> ???
+1080@120 -> ???
+2k@60    -> ???
+2k@120   -> ???
+4k@60    -> 35-40Mb/s
+4k@120   -> ???
 ```
 
 ---

@@ -19,7 +19,6 @@ use crate::result::PermutationResult;
 use crate::threads::was_ctrl_c_received;
 
 pub fn run_encode(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>) -> PermutationResult {
-    println!("Result will be stored for {}", p.decode_run);
     let mut result = PermutationResult::new(&p.get_metadata(), p.bitrate, &p.encoder_settings, &p.encoder, p.decode_run);
 
     let metadata = p.get_metadata();
@@ -143,7 +142,9 @@ fn run_overload_benchmark(metadata: &MetaData, ffmpeg_args: &FfmpegArgs, verbose
         eprintln!("Ffmpeg encountered an error when attempting to run, double-check that your environment is setup correctly. If so, open an issue in github!");
         // spawn the ffmpeg command, with output logged so we can troubleshoot better
         // modifying the command just a little bit so that it fails immediately
-        spawn_ffmpeg_child(&ffmpeg_args, verbose, Option::from(true));
+        let mut child = spawn_ffmpeg_child(&ffmpeg_args, verbose, Option::from(true));
+        sleep(Duration::from_secs(20));
+        child.kill().expect("Not able to kill the error ffmpeg thread");
     } else if trial_result.was_overloaded && !was_ctrl_c_received(&ctrl_channel) {
         let _ = child.kill();
         println!("Encoder was overloaded and could not encode the video file in realtime, stopping...");
