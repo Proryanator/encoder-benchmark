@@ -690,20 +690,20 @@ performance, gaining ~2fps or so in 1% lows.
 - <b>RAM:</b> 16GB of <a href='https://a.co/d/0O1qryh'>G.Skill Ripjaws V DDR4 3200Mhz</a>
 - <b>GPU:</b> <a href='https://a.co/d/iJLdgKx'>Asus GTX 1660 Super</a>
 - <b>NVME SSD</b>: <a href='https://a.co/d/clUM7ta'>PNY250GB NVMe PCI Gen3 x4</a>
-- <b>Intel Arc GPU:</b> ASRock A380 6GB
+- <b>Intel Arc GPU:</b> ASRock Challenger A380 6GB
 - <b>Intel Arc Driver:</b> 31.0.101.4255
 
-So far, the author did his testing at 4K@60, but as more resolutions get tested there will be more results below.
+Note: ranges of bitrates imply that vmaf scores were 93 or so on the lower bitrate, and achieved 95 on the upper bitrate.
 
 ```text
-720@60   -> ???
-720@120  -> ???
-1080@60  -> ???
-1080@120 -> ???
-2k@60    -> ???
-2k@120   -> ???
-4k@60    -> 35-40Mb/s
-4k@120   -> ???
+720@60   -> 5Mb/s
+720@120  -> 15-20Mb/s
+1080@60  -> 15-20Mb/s
+1080@120 -> 35-40Mb/s
+2k@60    -> 25Mb/s
+2k@120   -> 50Mb/s
+4k@60    -> 40-45Mb/s
+4k@120   -> 100Mb/s
 ```
 
 ---
