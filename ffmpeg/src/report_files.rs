@@ -12,18 +12,28 @@ use rev_buf_reader::RevBufReader;
 pub fn get_latest_ffmpeg_report_file() -> PathBuf {
     let mut log_file = None;
     let mut latest_time = FileTime::zero();
-
     let log_entries = get_logs_in_directory(".");
 
     // defining entry here so we can extend it's scope
     let mut entry: Option<&DirEntry>;
     let mut index = 0;
+    let mut file_time;
 
     while index != log_entries.len() {
         entry = log_entries.get(index);
-        let file_time = FileTime::from_last_modification_time(&entry.unwrap().metadata().unwrap());
+        let metadata = &entry.unwrap().metadata().unwrap();
+        println!("{:?}", &entry.unwrap());
+        if metadata.created().is_ok() {
+            println!("Using created file field");
+            file_time = FileTime::from_system_time(metadata.created().unwrap());
+        } else {
+            // Platforms that support metadata.created() will use
+            // last modification time as a fallback
+            file_time = FileTime::from_last_modification_time(metadata);
+        }
+
         if file_time > latest_time {
-            latest_time = FileTime::from_last_modification_time(&entry.unwrap().metadata().unwrap());
+            latest_time = file_time;
             log_file = entry;
         }
 
@@ -34,8 +44,7 @@ pub fn get_latest_ffmpeg_report_file() -> PathBuf {
 }
 
 pub fn extract_vmaf_score(line: &str) -> Result<c_float, ParseFloatError> {
-    return capture_group(line, r"VMAF score: ([0-9]+\.[0-9]+)")
-        .parse::<c_float>();
+    return capture_group(line, r"VMAF score: ([0-9]+\.[0-9]+)").parse::<c_float>();
 }
 
 pub fn read_last_line_at(line_number: i32) -> String {
@@ -62,9 +71,13 @@ pub fn capture_group(str: &str, regex: &str) -> String {
 }
 
 fn get_logs_in_directory(dir: &str) -> Vec<DirEntry> {
+    let re = Regex::new(r"^ffmpeg.*?\.log$").unwrap();
     let paths = fs::read_dir(dir).unwrap();
-    return paths.filter_map(|e| e.ok())
-        .filter(|p| p.file_type().unwrap().is_file())
+    return paths
+        .filter_map(|e| e.ok())
+        .filter(|p| {
+            p.file_type().unwrap().is_file() && re.is_match(p.file_name().to_str().unwrap())
+        })
         .collect::<Vec<DirEntry>>();
 }
 
@@ -88,7 +101,13 @@ mod tests {
         File::create("tmp.log").expect("Unable to create temporary log file for testing");
         let log_files = get_logs_in_directory("../../");
         for file in log_files {
-            assert!(file.path().extension().unwrap().to_str().unwrap().contains("log"));
+            assert!(file
+                .path()
+                .extension()
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .contains("log"));
         }
     }
 }
