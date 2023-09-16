@@ -21,9 +21,9 @@ pub fn get_latest_ffmpeg_report_file() -> PathBuf {
 
     while index != log_entries.len() {
         entry = log_entries.get(index);
-        let file_time = FileTime::from_creation_time(&entry.unwrap().metadata().unwrap()).unwrap();
+        let file_time = FileTime::from_last_modification_time(&entry.unwrap().metadata().unwrap());
         if file_time > latest_time {
-            latest_time = FileTime::from_creation_time(&entry.unwrap().metadata().unwrap()).unwrap();
+            latest_time = FileTime::from_last_modification_time(&entry.unwrap().metadata().unwrap());
             log_file = entry;
         }
 
