@@ -10,36 +10,8 @@ use regex::Regex;
 use rev_buf_reader::RevBufReader;
 
 pub fn get_latest_ffmpeg_report_file() -> PathBuf {
-    let mut log_file = None;
-    let mut latest_time = FileTime::zero();
     let log_entries = get_logs_in_directory(".");
-
-    // defining entry here so we can extend it's scope
-    let mut entry: Option<&DirEntry>;
-    let mut index = 0;
-    let mut file_time;
-
-    while index != log_entries.len() {
-        entry = log_entries.get(index);
-        let metadata = &entry.unwrap().metadata().unwrap();
-        println!("{:?}", &entry.unwrap());
-        if metadata.created().is_ok() {
-            println!("Using created file field");
-            file_time = FileTime::from_system_time(metadata.created().unwrap());
-        } else {
-            // Platforms that support metadata.created() will use
-            // last modification time as a fallback
-            file_time = FileTime::from_last_modification_time(metadata);
-        }
-
-        if file_time > latest_time {
-            latest_time = file_time;
-            log_file = entry;
-        }
-
-        index = index + 1;
-    }
-
+    let log_file = get_latest_log(log_entries);
     return log_file.unwrap().path();
 }
 
@@ -71,6 +43,7 @@ pub fn capture_group(str: &str, regex: &str) -> String {
 }
 
 fn get_logs_in_directory(dir: &str) -> Vec<DirEntry> {
+    // Only match ffmpeg log files
     let re = Regex::new(r"^ffmpeg.*?\.log$").unwrap();
     let paths = fs::read_dir(dir).unwrap();
     return paths
@@ -79,6 +52,31 @@ fn get_logs_in_directory(dir: &str) -> Vec<DirEntry> {
             p.file_type().unwrap().is_file() && re.is_match(p.file_name().to_str().unwrap())
         })
         .collect::<Vec<DirEntry>>();
+}
+
+fn get_latest_log(log_entries: Vec<DirEntry>) -> Option<DirEntry> {
+    let mut log_file: Option<DirEntry> = None;
+    let mut latest_time = FileTime::zero();
+
+    // defining file_time here so we can extend it's scope
+    let mut file_time;
+
+    for entry in log_entries.into_iter() {
+        let metadata = entry.metadata().unwrap();
+        if metadata.created().is_ok() {
+            file_time = FileTime::from_system_time(metadata.created().unwrap());
+        } else {
+            // Platforms that don't support metadata.created() will use the
+            // last modification time as a fallback
+            file_time = FileTime::from_last_modification_time(&metadata);
+        }
+
+        if file_time > latest_time {
+            latest_time = file_time;
+            log_file = Some(entry);
+        }
+    }
+    return log_file;
 }
 
 #[cfg(test)]
