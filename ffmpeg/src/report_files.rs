@@ -44,7 +44,7 @@ pub fn get_latest_ffmpeg_report_file() -> PathBuf {
 }
 
 pub fn extract_vmaf_score(line: &str) -> Result<c_float, ParseFloatError> {
-    return capture_group(line, r"VMAF score: ([0-9]+\.[0-9]+)").parse::<c_float>();
+    return capture_group(line, r"VMAF score: (\d+\.\d+)").parse::<c_float>();
 }
 
 pub fn read_last_line_at(line_number: i32) -> String {
