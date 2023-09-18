@@ -81,9 +81,9 @@ fn get_latest_log(log_entries: Vec<DirEntry>) -> Option<DirEntry> {
 
 #[cfg(test)]
 mod tests {
-    use std::fs::File;
+    use std::fs;
 
-    use crate::report_files::{extract_vmaf_score, get_logs_in_directory};
+    use crate::report_files::{extract_vmaf_score, get_latest_log, get_logs_in_directory};
 
     static VMAF_LINE: &str = "[Parsed_libvmaf_0 @ 00000169cf14fc00] VMAF score: 98.644730";
 
@@ -96,9 +96,20 @@ mod tests {
 
     #[test]
     fn log_files_only_test() {
-        File::create("tmp.log").expect("Unable to create temporary log file for testing");
-        let log_files = get_logs_in_directory("../../");
+        fs::create_dir("./log-test").unwrap();
+        fs::File::create("./log-test/ffmpeg-1.log")
+            .expect("Unable to create temporary log file for testing");
+        fs::File::create("./log-test/ffmpeg-2.log")
+            .expect("Unable to create temporary log file for testing");
+        fs::File::create("./log-test/some-other.log")
+            .expect("Unable to create temporary log file for testing");
+        fs::File::create("./log-test/diff-file-ext.txt")
+            .expect("Unable to create temporary log file for testing");
+        let log_files = get_logs_in_directory("./log-test");
+        // Only the ffmpeg*.log files should be in log_files
+        assert!(log_files.len() == 2);
         for file in log_files {
+            assert!(file.file_name().to_str().unwrap().contains("ffmpeg"));
             assert!(file
                 .path()
                 .extension()
@@ -107,5 +118,28 @@ mod tests {
                 .unwrap()
                 .contains("log"));
         }
+
+        fs::remove_dir_all("./log-test").unwrap();
+    }
+
+    #[test]
+    fn latest_log_file_test() {
+        fs::create_dir("./latest-log-test").expect("Unable to create temporary dir for testing");
+        let file1 = fs::File::create("./latest-log-test/ffmpeg-1.log")
+            .expect("Unable to create temporary log file for testing");
+        file1.sync_all().unwrap();
+        let file2 = fs::File::create("./latest-log-test/ffmpeg-2.log")
+            .expect("Unable to create temporary log file for testing");
+        file2.sync_all().unwrap();
+        let log_files = get_logs_in_directory("./latest-log-test");
+        let latest_log_file = get_latest_log(log_files);
+        // assert latest log file name
+        assert!(latest_log_file
+            .unwrap()
+            .file_name()
+            .to_str()
+            .unwrap()
+            .contains("ffmpeg-2.log"));
+        fs::remove_dir_all("./latest-log-test").unwrap();
     }
 }
