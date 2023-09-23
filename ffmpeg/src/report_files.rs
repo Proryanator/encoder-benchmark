@@ -139,9 +139,9 @@ mod tests {
             fs::remove_dir_all(test_latest_log_dir_path_str).unwrap();
         }
 
-        fs::create_dir(test_latest_log_dir_path_str).unwrap();
+        fs::create_dir(test_latest_log_dir_path_str).expect(EXPECTED_DIR_CREATED_MSG);
         let old_log_path_str = test_latest_log_dir_path_str.to_string() + "/ffmpeg-1.log";
-        let old_log_file = fs::File::create(old_log_path_str).expect(EXPECTED_DIR_CREATED_MSG);
+        let old_log_file = fs::File::create(old_log_path_str).expect(EXPECTED_TMP_CREATED_MSG);
         old_log_file.sync_all().unwrap();
 
         let new_log_path_str = test_latest_log_dir_path_str.to_string() + "/ffmpeg-2.log";
