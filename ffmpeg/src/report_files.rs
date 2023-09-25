@@ -144,6 +144,9 @@ mod tests {
         let old_log_file = fs::File::create(old_log_path_str).expect(EXPECTED_TMP_FILE_CREATED_MSG);
         old_log_file.sync_all().unwrap();
 
+        std::thread::sleep(std::time::Duration::from_millis(3000));
+
+
         let new_log_path_str = test_latest_log_dir_path_str.to_string() + "/ffmpeg-2.log";
         let new_log_file = fs::File::create(new_log_path_str).expect(EXPECTED_TMP_FILE_CREATED_MSG);
         new_log_file.sync_all().unwrap();
