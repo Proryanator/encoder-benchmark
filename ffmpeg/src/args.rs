@@ -273,7 +273,7 @@ mod tests {
     fn map_to_vmaf_to_string_test() {
         let vmaf_args = get_two_input_args().map_to_vmaf(FPS_LIMIT);
         assert_eq!(vmaf_args.to_string(),
-                   format!("-y -report -r {} -i tcp://localhost:2000?listen -r {} -i 1080-60.y4m -filter_complex libvmaf='n_threads={}:n_subsample=5' -f null -", FPS_LIMIT, FPS_LIMIT, num_cpus::get().to_string())
+                   format!("-y -report -r {} -i tcp://localhost:2000?listen&listen_timeout=3000&timeout=1000000 -r {} -i 1080-60.y4m -filter_complex libvmaf='n_threads={}:n_subsample=5' -f null -", FPS_LIMIT, FPS_LIMIT, num_cpus::get().to_string())
         );
     }
 
