@@ -144,19 +144,13 @@ mod tests {
         let old_log_file = fs::File::create(old_log_path_str).expect(EXPECTED_TMP_FILE_CREATED_MSG);
         old_log_file.sync_all().unwrap();
 
+        // Added sleep to ensure the 2nd file gets created at a later timestamp
         std::thread::sleep(std::time::Duration::from_millis(3000));
-
 
         let new_log_path_str = test_latest_log_dir_path_str.to_string() + "/ffmpeg-2.log";
         let new_log_file = fs::File::create(new_log_path_str).expect(EXPECTED_TMP_FILE_CREATED_MSG);
         new_log_file.sync_all().unwrap();
         let log_files = get_logs_in_directory(test_latest_log_dir_path_str);
-        //debug
-        for file in &log_files {
-            println!("{:?}", file.file_name());
-            println!("{:?}", &file.metadata().unwrap());
-        }
-
         let latest_log_file = get_latest_log(log_files);
         // assert latest log file name
         assert!(latest_log_file

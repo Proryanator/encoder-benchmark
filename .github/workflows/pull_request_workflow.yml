@@ -34,4 +34,4 @@ jobs:
           key: ${{inputs.platform}}-${{github.sha}}
 
       - name: Run Unit Tests
-        run: cargo test --no-fail-fast -- --show-output
+        run: cargo test --no-fail-fast
