@@ -21,3 +21,6 @@ target/
 
 # ignore the on-the-fly font file embedded in the executable
 tmp.flf
+
+# ignore tmp files created from unit tests
+ffmpeg/*log*
