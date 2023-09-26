@@ -3,7 +3,7 @@ use std::ffi::c_float;
 use codecs::get_vendor_for_codec;
 use codecs::vendor::Vendor;
 
-pub static TCP_LISTEN: &str = "tcp://localhost:2000?listen";
+pub static TCP_LISTEN: &str = "tcp://localhost:2000?listen&listen_timeout=3000&timeout=1000000";
 pub static NO_OUTPUT: &str = "-f null -";
 
 #[derive(Clone)]
