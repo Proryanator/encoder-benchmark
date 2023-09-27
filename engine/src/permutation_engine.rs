@@ -22,6 +22,9 @@ pub static TCP_OUTPUT: &str = "-f {} tcp://localhost:2000";
 // the hard-coded vmaf quality we want to shoot for when doing bitrate permutations
 const TARGET_QUALITY: c_float = 95.0;
 
+// the hard-coded value for max retries to calculate vmaf score
+const MAX_ATTEMPTS_CALC_QUALITY: i32 = 3;
+
 pub struct PermutationEngine {
     permutations: Vec<Permutation>,
     results: Vec<PermutationResult>,
@@ -65,7 +68,24 @@ impl PermutationEngine {
 
             if !result.was_overloaded && permutation.check_quality.clone() {
                 let vmaf_start_time = SystemTime::now();
-                result.vmaf_score = check_encode_quality(permutation.clone(), &ctrl_channel, permutation.verbose);
+                let mut quality_val = None;
+                for attempt in 0..MAX_ATTEMPTS_CALC_QUALITY {
+                    print!("  [ATTEMPT {}/{}] ", attempt + 1, MAX_ATTEMPTS_CALC_QUALITY);
+                    quality_val = check_encode_quality(permutation.clone(), &ctrl_channel, permutation.verbose);
+                    match quality_val {
+                        Some(val) => {
+                            result.vmaf_score = val;
+                            break;
+                        }
+
+                        None => println!("Check encode quality failed. Retrying..."),
+                    }
+                }
+
+                if quality_val.is_none() {
+                    panic!("Error, Failed to calc encode quality after {} attempts", MAX_ATTEMPTS_CALC_QUALITY);
+                }
+
                 result.vmaf_calculation_time = vmaf_start_time.elapsed().unwrap().as_secs();
 
                 // if this is higher than the target quality, stop at this bitrate during benchmark
@@ -122,7 +142,7 @@ impl PermutationEngine {
     }
 }
 
-fn check_encode_quality(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>, verbose: bool) -> c_float {
+fn check_encode_quality(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>, verbose: bool) -> Option<c_float> {
     let ffmpeg_args = FfmpegArgs::build_ffmpeg_args(p.video_file.clone(), p.encoder.clone(), &p.encoder_settings, p.bitrate.clone(), p.decode_run);
 
     println!("Calculating vmaf score; might take longer than original encode depending on your CPU...");
@@ -145,24 +165,29 @@ fn check_encode_quality(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, 
         println!("V: Encoder fmmpeg args sending to vmaf: {}", encoder_args.to_string());
     }
 
-    spawn_ffmpeg_child(&encoder_args, verbose, None);
+    let mut encoder_child = spawn_ffmpeg_child(&encoder_args, verbose, None);
 
     // not the cleanest way to do this but oh well
     progressbar::watch_encode_progress(metadata.frames, false, metadata.fps, false, ffmpeg_args.stats_period, ctrl_channel);
 
     // need to wait for the vmaf calculating thread to finish
     println!("VMAF calculation finishing up...");
-    vmaf_child.wait().expect("Not able to wait on the child thread to finish up");
+    let vmaf_child_status = vmaf_child.wait().expect("Vmaf child could not wait");
+    let vmaf_score_line = read_last_line_at(3);
+    //Cleanup process 
+    encoder_child.kill().expect("Could not kill encoder process");
 
-    let vmaf_log_file = get_latest_ffmpeg_report_file();
-    let vmaf_score_extract = extract_vmaf_score(read_last_line_at(3).as_str());
-    let vmaf_score = vmaf_score_extract.unwrap();
-    println!("VMAF score: {}\n", vmaf_score);
+    if vmaf_child_status.success() {
+        let vmaf_score_extract = extract_vmaf_score(vmaf_score_line.as_str());
+        let vmaf_score = vmaf_score_extract.expect(&format!("Could not parse score from line: {}", vmaf_score_line));
+        println!("VMAF score: {}\n", vmaf_score);
+        // Cleanup log file
+        let vmaf_log_file = get_latest_ffmpeg_report_file();
+        fs::remove_file(vmaf_log_file.as_path()).unwrap();
+        return Some(vmaf_score);
+    }
 
-    // cleanup the log file being used
-    fs::remove_file(vmaf_log_file.as_path()).unwrap();
-
-    return vmaf_score;
+    return None
 }
 
 fn will_be_duplicate(duplicates: &Vec<PermutationResult>, next_permutation: &Permutation) -> bool {
