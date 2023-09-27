@@ -112,7 +112,7 @@ it's highly suggested to use the same version, or at least version `6.*` of ffmp
    the <a href='https://github.com/Proryanator/encoder-benchmark/releases'>release section</a> of this repo onto the SSD
    that you wish to run the benchmark on
 5) Download the source files
-   from <a href='https://www.dropbox.com/sh/x08pkk47lc1v5ex/AADGaoOjOcA0-uPo7I0NaxL-a?dl=0'>here</a> (you may need to
+   from <a href='https://utsacloud-my.sharepoint.com/:f:/g/personal/hlz000_utsa_edu/EgkZZbJam-pAveNLTapnaOYB8gOvyx2naqV9NyIDb5c03A?e=hIfmLH'>here</a> (you may need to
    download individual files if the .zip is too large)
 6) Extract all the source files to the target SSD you wish to read the files form (same folder as the tool)
 
