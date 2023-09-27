@@ -57,7 +57,10 @@ impl PermutationEngine {
             log_permutation_header(i, &self.permutations, calc_time, ignore_factor);
 
             // if this permutation was added to the list of duplicates, skip to save calculation time
-            if !permutation.allow_duplicates && permutation.check_quality && will_be_duplicate(&self.dup_results, &permutation) {
+            if !permutation.allow_duplicates
+                && permutation.check_quality
+                && will_be_duplicate(&self.dup_results, &permutation)
+            {
                 draw_yellow_bar(permutation.get_metadata().frames);
                 println!("\n!!! Above encoder settings will produce identical vmaf score as other permutations, skipping... \n");
                 continue;
@@ -71,7 +74,11 @@ impl PermutationEngine {
                 let mut quality_val = None;
                 for attempt in 0..MAX_ATTEMPTS_CALC_QUALITY {
                     print!("  [ATTEMPT {}/{}] ", attempt + 1, MAX_ATTEMPTS_CALC_QUALITY);
-                    quality_val = check_encode_quality(permutation.clone(), &ctrl_channel, permutation.verbose);
+                    quality_val = check_encode_quality(
+                        permutation.clone(),
+                        &ctrl_channel,
+                        permutation.verbose,
+                    );
                     match quality_val {
                         Some(val) => {
                             result.vmaf_score = val;
@@ -83,7 +90,10 @@ impl PermutationEngine {
                 }
 
                 if quality_val.is_none() {
-                    panic!("Error, Failed to calc encode quality after {} attempts", MAX_ATTEMPTS_CALC_QUALITY);
+                    panic!(
+                        "Error, Failed to calc encode quality after {} attempts",
+                        MAX_ATTEMPTS_CALC_QUALITY
+                    );
                 }
 
                 result.vmaf_calculation_time = vmaf_start_time.elapsed().unwrap().as_secs();
@@ -97,8 +107,14 @@ impl PermutationEngine {
                 calc_time = Option::from(permutation_start_time.elapsed().unwrap());
             }
 
-            let is_initial_bitrate_permutation_over = i == self.permutations.len() - 1 || self.permutations[i + 1].clone().bitrate != permutation.bitrate;
-            self.add_result(result, is_initial_bitrate_permutation_over, permutation.check_quality, permutation.allow_duplicates);
+            let is_initial_bitrate_permutation_over = i == self.permutations.len() - 1
+                || self.permutations[i + 1].clone().bitrate != permutation.bitrate;
+            self.add_result(
+                result,
+                is_initial_bitrate_permutation_over,
+                permutation.check_quality,
+                permutation.allow_duplicates,
+            );
 
             // we'll calculate the ignore factor of permutations that will be skipped
             if is_initial_bitrate_permutation_over {
@@ -109,14 +125,23 @@ impl PermutationEngine {
 
             // stop if we've found the target quality, and we're done permuting over the current bitrate
             if target_quality_found && is_initial_bitrate_permutation_over {
-                println!("Found VMAF score >= {}, stopping permutations...", TARGET_QUALITY);
+                println!(
+                    "Found VMAF score >= {}, stopping permutations...",
+                    TARGET_QUALITY
+                );
                 break;
             }
         }
 
         // produce output files and other logging here
         let runtime_str = format_dhms(runtime.elapsed().unwrap().as_secs());
-        log_results_to_file(self.results.clone(), &runtime_str, self.dup_results.clone(), self.permutations[0].bitrate, false);
+        log_results_to_file(
+            self.results.clone(),
+            &runtime_str,
+            self.dup_results.clone(),
+            self.permutations[0].bitrate,
+            false,
+        );
         println!("Benchmark runtime: {}", runtime_str);
     }
 
@@ -124,10 +149,20 @@ impl PermutationEngine {
         self.permutations.push(permutation);
     }
 
-    fn add_result(&mut self, result: PermutationResult, is_bitrate_permutation_over: bool, is_checking_quality: bool, allow_duplicates: bool) {
+    fn add_result(
+        &mut self,
+        result: PermutationResult,
+        is_bitrate_permutation_over: bool,
+        is_checking_quality: bool,
+        allow_duplicates: bool,
+    ) {
         // only do this duplicate mapping during the first bitrate permutation
         // notice how we do not add this for overloaded results
-        if !allow_duplicates && is_checking_quality && !result.was_overloaded && !is_bitrate_permutation_over {
+        if !allow_duplicates
+            && is_checking_quality
+            && !result.was_overloaded
+            && !is_bitrate_permutation_over
+        {
             let score_str = result.vmaf_score.to_string();
             if !self.vmaf_scores.contains(&score_str) {
                 self.results.push(result);
@@ -142,16 +177,31 @@ impl PermutationEngine {
     }
 }
 
-fn check_encode_quality(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>, verbose: bool) -> Option<c_float> {
-    let ffmpeg_args = FfmpegArgs::build_ffmpeg_args(p.video_file.clone(), p.encoder.clone(), &p.encoder_settings, p.bitrate.clone(), p.decode_run);
+fn check_encode_quality(
+    mut p: Permutation,
+    ctrl_channel: &Result<Receiver<()>, Error>,
+    verbose: bool,
+) -> Option<c_float> {
+    let ffmpeg_args = FfmpegArgs::build_ffmpeg_args(
+        p.video_file.clone(),
+        p.encoder.clone(),
+        &p.encoder_settings,
+        p.bitrate.clone(),
+        p.decode_run,
+    );
 
-    println!("Calculating vmaf score; might take longer than original encode depending on your CPU...");
+    println!(
+        "Calculating vmaf score; might take longer than original encode depending on your CPU..."
+    );
 
     let metadata = p.get_metadata();
     // first spawn the ffmpeg instance to listen for incoming encode
     let vmaf_args = ffmpeg_args.map_to_vmaf(metadata.fps);
     if p.verbose {
-        println!("V: Vmaf args calculating quality: {}", vmaf_args.to_string());
+        println!(
+            "V: Vmaf args calculating quality: {}",
+            vmaf_args.to_string()
+        );
     }
 
     let mut vmaf_child = spawn_ffmpeg_child(&vmaf_args, verbose, None);
@@ -162,24 +212,39 @@ fn check_encode_quality(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, 
     encoder_args.output_args = String::from(insert_format_from(TCP_OUTPUT, &ffmpeg_args.encoder));
 
     if p.verbose {
-        println!("V: Encoder fmmpeg args sending to vmaf: {}", encoder_args.to_string());
+        println!(
+            "V: Encoder fmmpeg args sending to vmaf: {}",
+            encoder_args.to_string()
+        );
     }
 
     let mut encoder_child = spawn_ffmpeg_child(&encoder_args, verbose, None);
 
     // not the cleanest way to do this but oh well
-    progressbar::watch_encode_progress(metadata.frames, false, metadata.fps, false, ffmpeg_args.stats_period, ctrl_channel);
+    progressbar::watch_encode_progress(
+        metadata.frames,
+        false,
+        metadata.fps,
+        false,
+        ffmpeg_args.stats_period,
+        ctrl_channel,
+    );
 
     // need to wait for the vmaf calculating thread to finish
     println!("VMAF calculation finishing up...");
     let vmaf_child_status = vmaf_child.wait().expect("Vmaf child could not wait");
     let vmaf_score_line = read_last_line_at(3);
-    //Cleanup process 
-    encoder_child.kill().expect("Could not kill encoder process");
+    //Cleanup process
+    encoder_child
+        .kill()
+        .expect("Could not kill encoder process");
 
     if vmaf_child_status.success() {
         let vmaf_score_extract = extract_vmaf_score(vmaf_score_line.as_str());
-        let vmaf_score = vmaf_score_extract.expect(&format!("Could not parse score from line: {}", vmaf_score_line));
+        let vmaf_score = vmaf_score_extract.expect(&format!(
+            "Could not parse score from line: {}",
+            vmaf_score_line
+        ));
         println!("VMAF score: {}\n", vmaf_score);
         // Cleanup log file
         let vmaf_log_file = get_latest_ffmpeg_report_file();
@@ -187,7 +252,7 @@ fn check_encode_quality(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, 
         return Some(vmaf_score);
     }
 
-    return None
+    return None;
 }
 
 fn will_be_duplicate(duplicates: &Vec<PermutationResult>, next_permutation: &Permutation) -> bool {
@@ -201,7 +266,13 @@ fn will_be_duplicate(duplicates: &Vec<PermutationResult>, next_permutation: &Per
 }
 
 fn insert_format_from(input: &str, encoder: &String) -> String {
-    let format = if encoder.contains("h264") { "h264" } else if encoder.contains("hevc") { "hevc" } else {"ivf"};
+    let format = if encoder.contains("h264") {
+        "h264"
+    } else if encoder.contains("hevc") {
+        "hevc"
+    } else {
+        "ivf"
+    };
     // this should be cleaner when we support more than 1 type
     return input.replace("{}", format);
 }
