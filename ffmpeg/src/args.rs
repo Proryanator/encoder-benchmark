@@ -44,7 +44,13 @@ impl Default for FfmpegArgs {
 }
 
 impl FfmpegArgs {
-    pub fn build_ffmpeg_args(first_input: String, encoder: String, encoder_args: &String, current_bitrate: u32, decode: bool) -> FfmpegArgs {
+    pub fn build_ffmpeg_args(
+        first_input: String,
+        encoder: String,
+        encoder_args: &String,
+        current_bitrate: u32,
+        decode: bool,
+    ) -> FfmpegArgs {
         let ffmpeg_args = FfmpegArgs {
             first_input,
             bitrate: current_bitrate,
@@ -78,7 +84,13 @@ impl FfmpegArgs {
 
         // not all will want to send progress
         if self.send_progress {
-            output.push_str(format!("-progress tcp://localhost:1234 -stats_period {} ", self.stats_period).as_str());
+            output.push_str(
+                format!(
+                    "-progress tcp://localhost:1234 -stats_period {} ",
+                    self.stats_period
+                )
+                .as_str(),
+            );
         }
 
         // always pass the '-y' flag, for output to be overwritten
@@ -90,7 +102,7 @@ impl FfmpegArgs {
                 Vendor::Nvidia => "cuda",
                 Vendor::AMD => "d3d11va",
                 Vendor::IntelQSV => "qsv",
-                Vendor::Unknown => "error"
+                Vendor::Unknown => "error",
             };
 
             output.push_str("-hwaccel ");
@@ -121,7 +133,12 @@ impl FfmpegArgs {
             if self.is_vmaf {
                 append_vmaf_only_args(&mut output);
             } else {
-                append_encode_only_args(&mut output, self.bitrate, &self.encoder, &self.encoder_args);
+                append_encode_only_args(
+                    &mut output,
+                    self.bitrate,
+                    &self.encoder,
+                    &self.encoder_args,
+                );
             }
         }
 
@@ -161,7 +178,12 @@ impl FfmpegArgs {
     }
 }
 
-fn append_encode_only_args(arg_str: &mut String, bitrate: u32, encoder: &String, encoder_args: &String) {
+fn append_encode_only_args(
+    arg_str: &mut String,
+    bitrate: u32,
+    encoder: &String,
+    encoder_args: &String,
+) {
     arg_str.push_str([" -b:v", bitrate.to_string().as_str()].join(" ").as_str());
     // adding the rate amount to the end of the bitrate
     arg_str.push('M');
@@ -171,7 +193,13 @@ fn append_encode_only_args(arg_str: &mut String, bitrate: u32, encoder: &String,
 }
 
 fn append_vmaf_only_args(arg_str: &mut String) {
-    arg_str.push_str(format!(" -filter_complex libvmaf='n_threads={}:n_subsample=5'", num_cpus::get()).as_str());
+    arg_str.push_str(
+        format!(
+            " -filter_complex libvmaf='n_threads={}:n_subsample=5'",
+            num_cpus::get()
+        )
+        .as_str(),
+    );
 }
 
 // TODO: get rid of this later
@@ -197,7 +225,8 @@ mod tests {
     static BITRATE: u32 = 6;
     static FPS_LIMIT: u32 = 60;
     static ENCODER: &str = "h264_nvenc";
-    static ENCODER_ARGS: &str = "-preset hq -tune hq -profile:v high -rc cbr -multipass qres -rc-lookahead 8";
+    static ENCODER_ARGS: &str =
+        "-preset hq -tune hq -profile:v high -rc cbr -multipass qres -rc-lookahead 8";
 
     #[test]
     fn default_args_test() {
@@ -291,7 +320,13 @@ mod tests {
             list_supported_encoders: false,
         };
 
-        return FfmpegArgs::build_ffmpeg_args(args.source_file, args.encoder, &ENCODER_ARGS.to_string(), args.bitrate, false);
+        return FfmpegArgs::build_ffmpeg_args(
+            args.source_file,
+            args.encoder,
+            &ENCODER_ARGS.to_string(),
+            args.bitrate,
+            false,
+        );
     }
 
     fn get_two_input_args() -> FfmpegArgs {
