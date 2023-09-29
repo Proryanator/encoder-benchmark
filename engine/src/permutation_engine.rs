@@ -237,9 +237,16 @@ fn calc_vmaf_score(
         return Some(vmaf_score);
     }
 
-    let ffmpeg_error_log = vmaf_log_file.clone();
-    let org_filename = ffmpeg_error_log.file_name().unwrap().to_str().unwrap();
-    let new_filename = format!("perm-{}-attempt-{}-{}", perm_num, attempt + 1, org_filename);
+    let org_filename = vmaf_log_file.file_name().unwrap().to_str().unwrap();
+    let mut ffmpeg_error_log = vmaf_log_file.clone();
+    ffmpeg_error_log.set_extension("");
+    let ffmpeg_error_log_filename = ffmpeg_error_log.file_name().unwrap().to_str().unwrap();
+    let new_filename = format!(
+        "{}-perm-{}-attempt-{}.log",
+        ffmpeg_error_log_filename,
+        perm_num + 1,
+        attempt + 1
+    );
     rename(org_filename, &new_filename).expect("Could not rename file");
 
     if verbose {
