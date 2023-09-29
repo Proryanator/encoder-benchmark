@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 use std::ffi::c_float;
-use std::fs;
+use std::fs::{remove_file, rename};
 use std::time::{Duration, SystemTime};
 
 use compound_duration::format_dhms;
@@ -71,30 +71,13 @@ impl PermutationEngine {
 
             if !result.was_overloaded && permutation.check_quality.clone() {
                 let vmaf_start_time = SystemTime::now();
-                let mut quality_val = None;
-                for attempt in 0..MAX_ATTEMPTS_CALC_QUALITY {
-                    print!("  [ATTEMPT {}/{}] ", attempt + 1, MAX_ATTEMPTS_CALC_QUALITY);
-                    quality_val = check_encode_quality(
-                        permutation.clone(),
-                        &ctrl_channel,
-                        permutation.verbose,
-                    );
-                    match quality_val {
-                        Some(val) => {
-                            result.vmaf_score = val;
-                            break;
-                        }
-
-                        None => println!("Check encode quality failed. Retrying..."),
-                    }
-                }
-
-                if quality_val.is_none() {
-                    panic!(
-                        "Error, Failed to calc encode quality after {} attempts",
-                        MAX_ATTEMPTS_CALC_QUALITY
-                    );
-                }
+                result.vmaf_score = check_encode_quality(
+                    &mut permutation.clone(),
+                    &ctrl_channel,
+                    permutation.verbose,
+                    i,
+                )
+                .expect("Failed to check encode quality");
 
                 result.vmaf_calculation_time = vmaf_start_time.elapsed().unwrap().as_secs();
 
@@ -177,10 +160,12 @@ impl PermutationEngine {
     }
 }
 
-fn check_encode_quality(
-    mut p: Permutation,
+fn calc_vmaf_score(
+    p: &mut Permutation,
     ctrl_channel: &Result<Receiver<()>, Error>,
     verbose: bool,
+    attempt: i32,
+    perm_num: usize,
 ) -> Option<c_float> {
     let ffmpeg_args = FfmpegArgs::build_ffmpeg_args(
         p.video_file.clone(),
@@ -197,7 +182,7 @@ fn check_encode_quality(
     let metadata = p.get_metadata();
     // first spawn the ffmpeg instance to listen for incoming encode
     let vmaf_args = ffmpeg_args.map_to_vmaf(metadata.fps);
-    if p.verbose {
+    if verbose {
         println!(
             "V: Vmaf args calculating quality: {}",
             vmaf_args.to_string()
@@ -211,7 +196,7 @@ fn check_encode_quality(
 
     encoder_args.output_args = String::from(insert_format_from(TCP_OUTPUT, &ffmpeg_args.encoder));
 
-    if p.verbose {
+    if verbose {
         println!(
             "V: Encoder fmmpeg args sending to vmaf: {}",
             encoder_args.to_string()
@@ -233,6 +218,7 @@ fn check_encode_quality(
     // need to wait for the vmaf calculating thread to finish
     println!("VMAF calculation finishing up...");
     let vmaf_child_status = vmaf_child.wait().expect("Vmaf child could not wait");
+    let vmaf_log_file = get_latest_ffmpeg_report_file();
     let vmaf_score_line = read_last_line_at(3);
     //Cleanup process
     encoder_child
@@ -247,12 +233,54 @@ fn check_encode_quality(
         ));
         println!("VMAF score: {}\n", vmaf_score);
         // Cleanup log file
-        let vmaf_log_file = get_latest_ffmpeg_report_file();
-        fs::remove_file(vmaf_log_file.as_path()).unwrap();
+        remove_file(vmaf_log_file.as_path()).unwrap();
         return Some(vmaf_score);
     }
 
+    let ffmpeg_error_log = vmaf_log_file.clone();
+    let org_filename = ffmpeg_error_log.file_name().unwrap().to_str().unwrap();
+    let new_filename = format!("perm-{}-attempt-{}-{}", perm_num, attempt + 1, org_filename);
+    rename(org_filename, &new_filename).expect("Could not rename file");
+
+    if verbose {
+        let ffmpeg_error_line = read_last_line_at(1);
+        println!("{}", ffmpeg_error_line.as_str());
+        println!("See {} for more details.", new_filename);
+    }
+
     return None;
+}
+
+fn check_encode_quality(
+    p: &mut Permutation,
+    ctrl_channel: &Result<Receiver<()>, Error>,
+    verbose: bool,
+    perm_num: usize,
+) -> Option<c_float> {
+    let mut quality_val = None;
+    for attempt in 0..MAX_ATTEMPTS_CALC_QUALITY {
+        if verbose {
+            print!("[ ATTEMPT {}/{} ] ", attempt + 1, MAX_ATTEMPTS_CALC_QUALITY);
+        }
+        quality_val = calc_vmaf_score(p, &ctrl_channel, verbose, attempt, perm_num);
+        match quality_val {
+            Some(val) => {
+                quality_val = Some(val);
+                break;
+            }
+
+            None => println!("Check encode quality failed. Retrying..."),
+        }
+    }
+
+    if quality_val.is_none() {
+        panic!(
+            "Error, Failed to calc encode quality after {} attempts",
+            MAX_ATTEMPTS_CALC_QUALITY
+        );
+    }
+
+    return quality_val;
 }
 
 fn will_be_duplicate(duplicates: &Vec<PermutationResult>, next_permutation: &Permutation) -> bool {
