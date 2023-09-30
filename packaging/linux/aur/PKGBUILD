@@ -1,0 +1,54 @@
+# Maintainer: Proryanator <proryanator@gmail.com>
+# Maintainer: e-dong <eric2043@gmail.com>
+pkgname=encoder-benchmark-git
+pkgver=b7633c1
+pkgrel=1
+epoch=
+pkgdesc="A tool to benchmark your hardware's real-time video encoding capabilities."
+arch=("x86_64")
+url="https://github.com/Proryanator/encoder-benchmark"
+license=('GPL3')
+groups=()
+depends=('ffmpeg')
+makedepends=('git' 'cargo')
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("$pkgname::git+https://github.com/Proryanator/encoder-benchmark.git#commit=b7633c1")
+noextract=()
+sha256sums=('SKIP')
+validpgpkeys=()
+
+# Rust version
+export RUSTUP_TOOLCHAIN=1.72.0
+export CARGO_TARGET_DIR=target
+
+prepare() {
+    cargo fetch --locked --target "$CARCH-unknown-linux-gnu"
+}
+
+build() {
+	cd "$pkgname"
+    cargo build --release --frozen --all-features
+}
+
+check() {
+    cd "$pkgname"
+    cargo check --release
+    cargo test --release --frozen --all-features
+}
+
+package() {
+    cd "$pkgname"
+    find target/release \
+        -maxdepth 1 \
+        -executable \
+        -type f \
+        -exec install -Dm0755 -t "$pkgdir/usr/bin/" {} +
+}
