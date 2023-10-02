@@ -1,0 +1,3 @@
+[submodule "packaging/linux/aur/main"]
+	path = packaging/linux/aur/main
+	url = ssh://aur@aur.archlinux.org/encoder-benchmark-git.git
