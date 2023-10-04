@@ -19,7 +19,11 @@ impl QSV {
             presets: get_qsv_presets(),
             // this is the only difference between hevc & h264
             // note: there are more profiles for hevc but, on dev's CPU they were not supported
-            profiles: if is_hevc { vec!["unknown", "main", "mainsp"] } else { vec!["unknown", "baseline", "main", "high"] },
+            profiles: if is_hevc {
+                vec!["unknown", "main", "mainsp"]
+            } else {
+                vec!["unknown", "baseline", "main", "high"]
+            },
             permutations: Vec::new(),
             // starts at -1, so that first next() will return the first element
             index: -1,
@@ -36,7 +40,9 @@ impl QSV {
 }
 
 fn get_qsv_presets() -> Vec<&'static str> {
-    return vec!["veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"];
+    return vec![
+        "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow",
+    ];
 }
 
 #[derive(Copy, Clone)]
@@ -68,7 +74,10 @@ impl Iterator for QSV {
         self.index += 1;
 
         let usize_index = self.index as usize;
-        return Option::from((usize_index as usize, self.permutations.get(usize_index).unwrap().to_string()));
+        return Option::from((
+            usize_index as usize,
+            self.permutations.get(usize_index).unwrap().to_string(),
+        ));
     }
 }
 
@@ -81,7 +90,8 @@ impl Permute for QSV {
         self.permutations.clear();
 
         let mut permutations = vec![&self.presets, &self.profiles]
-            .into_iter().multi_cartesian_product();
+            .into_iter()
+            .multi_cartesian_product();
 
         loop {
             let perm = permutations.next();
@@ -109,7 +119,8 @@ impl Permute for QSV {
         self.permutations.clear();
 
         // note: this only works when hevc/h264 both use just 1 profile, if we add more this will break
-        self.permutations.push(String::from(self.get_benchmark_settings()));
+        self.permutations
+            .push(String::from(self.get_benchmark_settings()));
         return &self.permutations;
     }
 

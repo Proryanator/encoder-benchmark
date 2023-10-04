@@ -69,7 +69,11 @@ fn log_special_arguments(cli: &PermutorCli) {
     }
 }
 
-fn build_nvenc_setting_permutations(engine: &mut PermutationEngine, cli: &PermutorCli, bitrate: u32) {
+fn build_nvenc_setting_permutations(
+    engine: &mut PermutationEngine,
+    cli: &PermutorCli,
+    bitrate: u32,
+) {
     let mut nvenc = Nvenc::new(cli.encoder == "hevc_nvenc", cli.gpu);
 
     // initialize the permutations each time

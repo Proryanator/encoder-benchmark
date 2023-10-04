@@ -27,7 +27,14 @@ impl Default for TrialResult {
     }
 }
 
-pub fn watch_encode_progress(total_frames: u64, detect_overload: bool, target_fps: u32, verbose: bool, stats_period: c_float, ctrl_channel: &Result<Receiver<()>, Error>) -> TrialResult {
+pub fn watch_encode_progress(
+    total_frames: u64,
+    detect_overload: bool,
+    target_fps: u32,
+    verbose: bool,
+    stats_period: c_float,
+    ctrl_channel: &Result<Receiver<()>, Error>,
+) -> TrialResult {
     // set this flag every second to see real-time fps statistics and other information
     let mut can_log_verbose = true;
     let verbose_log_interval = time::Duration::from_secs(1);
@@ -69,7 +76,9 @@ pub fn watch_encode_progress(total_frames: u64, detect_overload: bool, target_fp
         exit_on_ctrl_c(&ctrl_channel);
 
         // takes into account the stat update period to properly adjust the calculated FPS
-        let calculated_fps = ((FRAME.load(Ordering::Relaxed) - PREVIOUS_FRAME.load(Ordering::Relaxed)) * interval_adjustment) as u16;
+        let calculated_fps = ((FRAME.load(Ordering::Relaxed)
+            - PREVIOUS_FRAME.load(Ordering::Relaxed))
+            * interval_adjustment) as u16;
 
         if verbose && can_log_verbose {
             println!("V: Calculated fps: {}", calculated_fps);
@@ -137,7 +146,10 @@ pub fn watch_encode_progress(total_frames: u64, detect_overload: bool, target_fp
     println!();
 
     // kill the tcp reading thread
-    stat_listener.stop().join().expect("Child thread reading TCP did not finish");
+    stat_listener
+        .stop()
+        .join()
+        .expect("Child thread reading TCP did not finish");
 
     trial_result.was_overloaded = (FRAME.load(Ordering::Relaxed) as u64) != total_frames;
     // reset the static values
@@ -148,11 +160,16 @@ pub fn watch_encode_progress(total_frames: u64, detect_overload: bool, target_fp
 }
 
 pub fn set_bar_style(bar: &ProgressBar, color: &str) {
-    let template = "{spinner:.%} [{elapsed_precise}] [{wide_bar:.%}] {pos}/{len} frames ({eta_precise})";
-    bar.set_style(ProgressStyle::with_template(&str::replace(template, "%", color).as_str())
-        .unwrap()
-        .with_key("eta", |state: &ProgressState, w: &mut dyn Write| write!(w, "{:.1}s", state.eta().as_secs_f64()).unwrap())
-        .progress_chars("#>-"));
+    let template =
+        "{spinner:.%} [{elapsed_precise}] [{wide_bar:.%}] {pos}/{len} frames ({eta_precise})";
+    bar.set_style(
+        ProgressStyle::with_template(&str::replace(template, "%", color).as_str())
+            .unwrap()
+            .with_key("eta", |state: &ProgressState, w: &mut dyn Write| {
+                write!(w, "{:.1}s", state.eta().as_secs_f64()).unwrap()
+            })
+            .progress_chars("#>-"),
+    );
 }
 
 pub fn draw_yellow_bar(total_frames: u64) {

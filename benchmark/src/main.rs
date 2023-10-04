@@ -1,6 +1,6 @@
-use std::{env, fs};
 use std::fs::File;
 use std::io::Write;
+use std::{env, fs};
 
 use clap::Parser;
 use figlet_rs::FIGfont;
@@ -103,7 +103,10 @@ fn read_user_input(cli: &mut BenchmarkCli, gpus: Vec<String>) {
 
     loop {
         print_options(get_supported_encoders().to_vec());
-        print!("Choose encoder [0-{}]: ", get_supported_encoders().len() - 1);
+        print!(
+            "Choose encoder [0-{}]: ",
+            get_supported_encoders().len() - 1
+        );
         let input: String = read!("{}");
 
         if !is_numeric(&input) {
@@ -152,7 +155,10 @@ fn read_user_input(cli: &mut BenchmarkCli, gpus: Vec<String>) {
     if !full_bench {
         loop {
             print_options(get_supported_inputs().to_vec());
-            print!("\nChoose video file to encode [0-{}]: ", get_supported_inputs().len() - 1);
+            print!(
+                "\nChoose video file to encode [0-{}]: ",
+                get_supported_inputs().len() - 1
+            );
             let input: String = read!("{}");
             if !is_numeric(&input) {
                 println!("Invalid input, try again...");
@@ -227,9 +233,13 @@ fn get_benchmark_settings_for(cli: &BenchmarkCli) -> String {
 
 fn get_bitrate_for(metadata: &MetaData, string: String) -> u32 {
     if string.contains("nvenc") {
-        return *Nvenc::get_resolution_to_bitrate_map(metadata.fps).get(&metadata.get_res()).unwrap();
+        return *Nvenc::get_resolution_to_bitrate_map(metadata.fps)
+            .get(&metadata.get_res())
+            .unwrap();
     } else {
-        return *Amf::get_resolution_to_bitrate_map(metadata.fps).get(&metadata.get_res()).unwrap();
+        return *Amf::get_resolution_to_bitrate_map(metadata.fps)
+            .get(&metadata.get_res())
+            .unwrap();
     }
 }
 

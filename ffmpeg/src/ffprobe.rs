@@ -7,7 +7,8 @@ pub fn probe_for_video_metadata(input_file: &String) -> MetaData {
     let ffprobe = Command::new("ffprobe")
         .args(args.split(" "))
         .stdout(Stdio::piped())
-        .output().expect("Unable to run ffprobe to collect metadata on the input video file");
+        .output()
+        .expect("Unable to run ffprobe to collect metadata on the input video file");
 
     let output = String::from_utf8_lossy(&ffprobe.stdout);
     return extract_metadata(output.to_string());
@@ -20,9 +21,27 @@ fn extract_metadata(line: String) -> MetaData {
 
     let metadata = MetaData {
         fps: fps_splits.get(0).unwrap().trim().parse::<u32>().unwrap(),
-        frames: splits.get(3).unwrap().to_string().trim().parse::<u64>().unwrap(),
-        width: splits.get(0).unwrap().to_string().trim().parse::<u32>().unwrap(),
-        height: splits.get(1).unwrap().to_string().trim().parse::<u32>().unwrap(),
+        frames: splits
+            .get(3)
+            .unwrap()
+            .to_string()
+            .trim()
+            .parse::<u64>()
+            .unwrap(),
+        width: splits
+            .get(0)
+            .unwrap()
+            .to_string()
+            .trim()
+            .parse::<u32>()
+            .unwrap(),
+        height: splits
+            .get(1)
+            .unwrap()
+            .to_string()
+            .trim()
+            .parse::<u32>()
+            .unwrap(),
     };
 
     return metadata;
