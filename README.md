@@ -107,7 +107,7 @@ it's highly suggested to use the same version, or at least version `6.*` of ffmp
 3) ffmpeg/ffprobe must be available on your path (tool will error out if it can't find
    either); <a href='https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/'>quick path setup guide for
    Windows
-   10+</a>
+   10+</a>. Note: when following those instructions do make sure to add the `ffmpeg_folder\bin` directory to your path (any other directory will not work)
 4) Download either the **benchmark** tool or the **permutor** tool (depending on your use case) for your platform from
    the <a href='https://github.com/Proryanator/encoder-benchmark/releases'>release section</a> of this repo onto the SSD
    that you wish to run the benchmark on
