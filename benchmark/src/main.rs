@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::Write;
-use std::{env, fs};
+use std::{env, fs, panic};
 
 use clap::Parser;
 use figlet_rs::FIGfont;
@@ -25,6 +25,18 @@ use crate::benchmark_cli::BenchmarkCli;
 mod benchmark_cli;
 
 fn main() {
+    let result = panic::catch_unwind(|| {
+        benchmark();
+    });
+
+    if result.is_err() {
+        eprintln!("Unhandled error encountered, see panic errors above...");
+    }
+
+    pause();
+}
+
+fn benchmark() {
     let small_font = include_str!("small.flf");
 
     fig_title(String::from("Encoder-Benchmark"), String::from(small_font));
