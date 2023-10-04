@@ -13,12 +13,6 @@ pub struct BenchmarkEngine {
     results: Vec<PermutationResult>,
 }
 
-
-
-
-
-
-
 impl BenchmarkEngine {
     pub fn new() -> Self {
         return Self {
