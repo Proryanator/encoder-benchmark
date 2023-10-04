@@ -722,6 +722,24 @@ Screenshots or log file uploads are much appreciated!
 
 ## Contributing
 
+### Rust Version
 Project is written in Rust, with version `1.66.0` at time of writing.
 
-Setup your dev environment for Rust and you'll be able to contribute.
+### RustRover IDE (suggested by Author)
+
+The author uses <a href='https://www.jetbrains.com/rust/'>RustRover</a> for most of his Rust development, although you're more than welcome to use other IDE's.
+
+#### Setting up automatic formatting via rustfmt in RustRover
+It's suggested that you setup automatic formatting in RustRover to avoid the `rustfmt` job failing and blocking your PR.
+
+Go to Settings -> Languages and Frameworks -> Rust -> Rustfmt, and enable `Use Rustfmt instead of the build-in formatter` and `Run Rustfmt automatically on Save`.
+
+![rustrover-rustfmt.png](docs%2Frustrover-rustfmt.png)
+
+### Visual Studio Code
+
+You can also use VSCode if you want when contributing to the project. Make sure you have the plugin <a href='https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer'>rust-analyzer</a> which seems to already have a built-in formatter for rust.
+
+Just make sure you enable formatting on save via `Settings -> Search for 'format' -> toggle 'Editor: Format On Save'`
+
+![vscode-auto-format.png](docs%2Fvscode-auto-format.png)

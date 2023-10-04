@@ -41,7 +41,12 @@ pub struct PermutorCli {
 
 impl PermutorCli {
     pub fn validate(&mut self) {
-        standard_cli_check(self.list_supported_encoders, &self.encoder, &self.source_file, false);
+        standard_cli_check(
+            self.list_supported_encoders,
+            &self.encoder,
+            &self.source_file,
+            false,
+        );
 
         if self.source_file.is_empty() {
             println!("Error: No source file was provided to run on, please specify an input file");
@@ -54,6 +59,10 @@ impl PermutorCli {
     }
 
     pub fn has_special_options(&self) -> bool {
-        return self.check_quality || self.detect_overload || self.verbose || self.test_run || self.allow_duplicate_scores;
+        return self.check_quality
+            || self.detect_overload
+            || self.verbose
+            || self.test_run
+            || self.allow_duplicate_scores;
     }
 }

@@ -25,5 +25,6 @@ fn is_installed(program: &str) -> bool {
         // important cause we don't want the help message to output here
         .stdout(Stdio::null())
         .stderr(Stdio::null())
-        .spawn().is_ok();
+        .spawn()
+        .is_ok();
 }

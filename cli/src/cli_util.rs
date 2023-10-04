@@ -1,9 +1,11 @@
-use std::{env, fs};
 use std::path::Path;
+use std::{env, fs};
 
 use environment::env::fail_if_environment_not_setup;
 
-use crate::supported::{get_download_url, get_supported_encoders, get_supported_inputs, is_encoder_supported};
+use crate::supported::{
+    get_download_url, get_supported_encoders, get_supported_inputs, is_encoder_supported,
+};
 
 pub fn is_dev() -> bool {
     let args: Vec<String> = env::args().collect();
@@ -14,7 +16,8 @@ pub fn get_video_files() -> Vec<String> {
     let locale = if is_dev() { "../" } else { "." };
 
     let paths = fs::read_dir(locale).unwrap();
-    return paths.filter_map(|e| e.ok())
+    return paths
+        .filter_map(|e| e.ok())
         .filter(|p| p.file_type().unwrap().is_file())
         .map(|p| p.file_name().to_str().unwrap().to_string())
         .collect::<Vec<String>>();
@@ -32,7 +35,12 @@ pub fn are_all_source_files_present() -> bool {
     return true;
 }
 
-pub fn standard_cli_check(show_encoders: bool, encoder: &String, source_file: &String, was_ui_opened: bool) {
+pub fn standard_cli_check(
+    show_encoders: bool,
+    encoder: &String,
+    source_file: &String,
+    was_ui_opened: bool,
+) {
     fail_if_environment_not_setup();
 
     if show_encoders {
@@ -49,7 +57,10 @@ pub fn standard_cli_check(show_encoders: bool, encoder: &String, source_file: &S
 
     // check if specified encoder is supported by the tool
     if !is_encoder_supported(&encoder) {
-        println!("Error: [{}] is not a supported encoder at the moment", encoder);
+        println!(
+            "Error: [{}] is not a supported encoder at the moment",
+            encoder
+        );
         error_with_ack(was_ui_opened);
     }
 

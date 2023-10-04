@@ -24,7 +24,13 @@ pub struct PermutationResult {
 }
 
 impl PermutationResult {
-    pub fn new(metadata: &MetaData, bitrate: u32, encoder_settings: &String, encoder: &str, decode: bool) -> Self {
+    pub fn new(
+        metadata: &MetaData,
+        bitrate: u32,
+        encoder_settings: &String,
+        encoder: &str,
+        decode: bool,
+    ) -> Self {
         Self {
             encoder: String::from(encoder),
             was_overloaded: false,
@@ -43,11 +49,26 @@ impl PermutationResult {
         let mut default = String::new();
 
         let overloaded_indicator = if self.was_overloaded { "[O]" } else { "   " };
-        default.push_str(format!("{}{}x{}\t{}\t{}Mb/s", overloaded_indicator, self.metadata.width,
-                                 self.metadata.height, self.metadata.fps, self.bitrate).as_str());
+        default.push_str(
+            format!(
+                "{}{}x{}\t{}\t{}Mb/s",
+                overloaded_indicator,
+                self.metadata.width,
+                self.metadata.height,
+                self.metadata.fps,
+                self.bitrate
+            )
+            .as_str(),
+        );
 
         // adjust tabs based on expected vmaf score, or lack of one
-        let vmaf_score_str = if self.was_overloaded { format!("{:.5}\t\t", self.vmaf_score) } else if self.vmaf_score != 0.0 { format!("{:.5}\t", self.vmaf_score) } else { format!("0.00000\t\t") };
+        let vmaf_score_str = if self.was_overloaded {
+            format!("{:.5}\t\t", self.vmaf_score)
+        } else if self.vmaf_score != 0.0 {
+            format!("{:.5}\t", self.vmaf_score)
+        } else {
+            format!("0.00000\t\t")
+        };
 
         let effective_settings;
         if self.decode_run {
@@ -56,21 +77,47 @@ impl PermutationResult {
             effective_settings = self.encoder_settings.clone()
         }
 
-        default.push_str(format!("\t\t{}\t\t{}\t\t{}{:.0}\t\t{}\t\t{}\t\t{}",
-                                 format_dhms(self.encode_time), format_dhms(self.vmaf_calculation_time), vmaf_score_str,
-                                 self.fps_stats.avg, self.fps_stats.one_perc_low, self.fps_stats.ninety_perc, effective_settings).as_str());
+        default.push_str(
+            format!(
+                "\t\t{}\t\t{}\t\t{}{:.0}\t\t{}\t\t{}\t\t{}",
+                format_dhms(self.encode_time),
+                format_dhms(self.vmaf_calculation_time),
+                vmaf_score_str,
+                self.fps_stats.avg,
+                self.fps_stats.one_perc_low,
+                self.fps_stats.ninety_perc,
+                effective_settings
+            )
+            .as_str(),
+        );
 
         return default;
     }
 }
 
-pub fn log_results_to_file(results: Vec<PermutationResult>, runtime_str: &String, dup_results: Vec<PermutationResult>, bitrate: u32, is_benchmark: bool) {
+pub fn log_results_to_file(
+    results: Vec<PermutationResult>,
+    runtime_str: &String,
+    dup_results: Vec<PermutationResult>,
+    bitrate: u32,
+    is_benchmark: bool,
+) {
     // might make this naming here more robust eventually
     let first_metadata = results.get(0).unwrap().metadata;
     let encoder = results.get(0).unwrap().encoder.as_str();
-    let permute_file_name = format!("{}-{}-{}.log", encoder, first_metadata.get_res(), first_metadata.fps).to_string();
+    let permute_file_name = format!(
+        "{}-{}-{}.log",
+        encoder,
+        first_metadata.get_res(),
+        first_metadata.fps
+    )
+    .to_string();
     let benchmark_file_name = format!("{}-benchmark.log", encoder).to_string();
-    let file_name = if is_benchmark { benchmark_file_name } else { permute_file_name };
+    let file_name = if is_benchmark {
+        benchmark_file_name
+    } else {
+        permute_file_name
+    };
 
     let mut w = File::create(file_name).unwrap();
 

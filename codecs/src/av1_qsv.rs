@@ -39,7 +39,9 @@ impl AV1QSV {
 }
 
 fn get_qsv_presets() -> Vec<&'static str> {
-    return vec!["veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"];
+    return vec![
+        "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow",
+    ];
 }
 
 #[derive(Copy, Clone)]
@@ -74,7 +76,10 @@ impl Iterator for AV1QSV {
         self.index += 1;
 
         let usize_index = self.index as usize;
-        return Option::from((usize_index as usize, self.permutations.get(usize_index).unwrap().to_string()));
+        return Option::from((
+            usize_index as usize,
+            self.permutations.get(usize_index).unwrap().to_string(),
+        ));
     }
 }
 
@@ -87,7 +92,8 @@ impl Permute for AV1QSV {
         self.permutations.clear();
 
         let mut permutations = vec![&self.presets, &self.profiles, &self.async_depth]
-            .into_iter().multi_cartesian_product();
+            .into_iter()
+            .multi_cartesian_product();
 
         loop {
             let perm = permutations.next();
@@ -116,7 +122,8 @@ impl Permute for AV1QSV {
         self.permutations.clear();
 
         // note: this only works when hevc/h264 both use just 1 profile, if we add more this will break
-        self.permutations.push(String::from(self.get_benchmark_settings()));
+        self.permutations
+            .push(String::from(self.get_benchmark_settings()));
         return &self.permutations;
     }
 
