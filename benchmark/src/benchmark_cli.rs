@@ -45,12 +45,20 @@ impl BenchmarkCli {
     }
 
     pub fn validate(&mut self) {
-        standard_cli_check(self.list_supported_encoders, &self.encoder, &self.source_file, self.was_ui_opened);
+        standard_cli_check(
+            self.list_supported_encoders,
+            &self.encoder,
+            &self.source_file,
+            self.was_ui_opened,
+        );
 
         // if you did not provide a source file, we'll be running on all expected files
         if self.source_file.is_empty() && !are_all_source_files_present() {
             println!("You're missing some video source files to run the standard benchmark; you should have the following: \n{:?}", get_supported_inputs());
-            println!("Please download the ones you are missing from: {}", get_download_url());
+            println!(
+                "Please download the ones you are missing from: {}",
+                get_download_url()
+            );
             println!("If you want to run the tool against a specific resolution/fps, download just that source file and specify it with '-s'");
             error_with_ack(self.was_ui_opened);
         }

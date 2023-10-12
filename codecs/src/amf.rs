@@ -23,7 +23,11 @@ impl Amf {
             usages: get_amf_usages(),
             qualities: get_amf_quality(),
             // this is the only difference between hevc & h264
-            profiles: if is_hevc { vec!["main"] } else { vec!["main", "high", "constrained_baseline", "constrained_high"] },
+            profiles: if is_hevc {
+                vec!["main"]
+            } else {
+                vec!["main", "high", "constrained_baseline", "constrained_high"]
+            },
             // leaving out vbr rate controls as these are not ideal for game streaming
             profile_tiers: get_amf_profile_tiers(is_hevc),
             rate_controls: vec!["cbr"],
@@ -38,7 +42,10 @@ impl Amf {
         // both hevc and h264 perform best at main (kinda, h264 it doesn't matter much)
         // hevc and h264 both share the same high fps with the same settings, even without profile_tier for hevc
         let profile = "main";
-        return format!("-usage ultralowlatency -quality speed -profile:v {} -rc cbr -cbr true -gpu {}", profile, self.gpu);
+        return format!(
+            "-usage ultralowlatency -quality speed -profile:v {} -rc cbr -cbr true -gpu {}",
+            profile, self.gpu
+        );
     }
 
     fn has_next(&self) -> bool {
@@ -111,7 +118,10 @@ impl Iterator for Amf {
         self.index += 1;
 
         let usize_index = self.index as usize;
-        return Option::from((usize_index as usize, self.permutations.get(usize_index).unwrap().to_string()));
+        return Option::from((
+            usize_index as usize,
+            self.permutations.get(usize_index).unwrap().to_string(),
+        ));
     }
 }
 
@@ -123,10 +133,24 @@ impl Permute for Amf {
         // clear the vectors if there were entries before
         self.permutations.clear();
 
-        let mut permutations = if self.profile_tiers.is_empty() { vec![&self.usages, &self.qualities, &self.profiles, &self.rate_controls] } else {
-            vec![&self.usages, &self.qualities, &self.profiles, &self.profile_tiers, &self.rate_controls]
+        let mut permutations = if self.profile_tiers.is_empty() {
+            vec![
+                &self.usages,
+                &self.qualities,
+                &self.profiles,
+                &self.rate_controls,
+            ]
+        } else {
+            vec![
+                &self.usages,
+                &self.qualities,
+                &self.profiles,
+                &self.profile_tiers,
+                &self.rate_controls,
+            ]
         }
-            .into_iter().multi_cartesian_product();
+        .into_iter()
+        .multi_cartesian_product();
 
         loop {
             let perm = permutations.next();
@@ -135,7 +159,11 @@ impl Permute for Amf {
             }
 
             let unwrapped_perm = perm.unwrap();
-            let profile_tier = if !self.profile_tiers.is_empty() { unwrapped_perm.get(3).unwrap() } else { "" };
+            let profile_tier = if !self.profile_tiers.is_empty() {
+                unwrapped_perm.get(3).unwrap()
+            } else {
+                ""
+            };
             let rc_index = if !self.profile_tiers.is_empty() { 4 } else { 3 };
             let settings = AmfSettings {
                 usage: unwrapped_perm.get(0).unwrap(),
@@ -160,10 +188,10 @@ impl Permute for Amf {
         self.permutations.clear();
 
         // note: this only works when hevc/h264 both use just 1 profile, if we add more this will break
-        self.permutations.push(String::from(self.get_benchmark_settings()));
+        self.permutations
+            .push(String::from(self.get_benchmark_settings()));
         return &self.permutations;
     }
-
 
     fn get_resolution_to_bitrate_map(fps: u32) -> HashMap<String, u32> {
         let mut map: HashMap<String, u32> = HashMap::new();

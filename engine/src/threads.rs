@@ -1,15 +1,15 @@
-use crossbeam_channel::{bounded, Receiver, select};
+use crossbeam_channel::{bounded, select, Receiver};
 use ctrlc::Error;
 
 pub fn was_ctrl_c_received(ctrl_c_events: &Result<Receiver<()>, Error>) -> bool {
     select! {
-            recv(ctrl_c_events.as_ref().unwrap()) -> _ => {
-                return true;
-            },
-            default() => {
-                return false;
-            }
+        recv(ctrl_c_events.as_ref().unwrap()) -> _ => {
+            return true;
+        },
+        default() => {
+            return false;
         }
+    }
 }
 
 pub fn exit_on_ctrl_c(ctrl_channel: &Result<Receiver<()>, Error>) {

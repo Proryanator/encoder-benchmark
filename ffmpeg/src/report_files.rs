@@ -44,7 +44,7 @@ pub fn capture_group(str: &str, regex: &str) -> String {
 
 fn get_logs_in_directory(dir: &str) -> Vec<DirEntry> {
     // Only match ffmpeg log files
-    let re = Regex::new(r"ffmpeg.*?\.log$").unwrap();
+    let re = Regex::new(r"^ffmpeg.*?\.log$").unwrap();
     let paths = fs::read_dir(dir).unwrap();
     return paths
         .filter_map(|e| e.ok())

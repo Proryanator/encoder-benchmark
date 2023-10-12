@@ -17,7 +17,10 @@ impl MetaData {
     }
 
     pub fn to_string(&self) -> String {
-        return format!("Video metadata: fps: {}, total_frames: {}, resolution: {}x{}", self.fps, self.frames, self.width, self.height);
+        return format!(
+            "Video metadata: fps: {}, total_frames: {}, resolution: {}x{}",
+            self.fps, self.frames, self.width, self.height
+        );
     }
 
     pub fn get_res(&self) -> String {

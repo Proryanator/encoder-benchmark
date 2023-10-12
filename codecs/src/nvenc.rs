@@ -33,7 +33,11 @@ impl Nvenc {
     }
 
     pub fn get_benchmark_settings(&self) -> String {
-        return format!("-preset p1 -tune ll -profile:v {} -rc cbr -cbr true -gpu {}", self.profiles.get(0).unwrap(), self.gpu);
+        return format!(
+            "-preset p1 -tune ll -profile:v {} -rc cbr -cbr true -gpu {}",
+            self.profiles.get(0).unwrap(),
+            self.gpu
+        );
     }
 
     fn has_next(&self) -> bool {
@@ -89,7 +93,10 @@ impl Iterator for Nvenc {
         self.index += 1;
 
         let usize_index = self.index as usize;
-        return Option::from((usize_index as usize, self.permutations.get(usize_index).unwrap().to_string()));
+        return Option::from((
+            usize_index as usize,
+            self.permutations.get(usize_index).unwrap().to_string(),
+        ));
     }
 }
 
@@ -101,8 +108,14 @@ impl Permute for Nvenc {
         // clear the vectors if there were entries before
         self.permutations.clear();
 
-        let mut permutations = vec![&self.presets, &self.tunes, &self.profiles, &self.rate_controls]
-            .into_iter().multi_cartesian_product();
+        let mut permutations = vec![
+            &self.presets,
+            &self.tunes,
+            &self.profiles,
+            &self.rate_controls,
+        ]
+        .into_iter()
+        .multi_cartesian_product();
 
         loop {
             let perm = permutations.next();
@@ -133,7 +146,8 @@ impl Permute for Nvenc {
         self.permutations.clear();
 
         // note: this only works when hevc/h264 both use just 1 profile, if we add more this will break
-        self.permutations.push(String::from(self.get_benchmark_settings()));
+        self.permutations
+            .push(String::from(self.get_benchmark_settings()));
         return &self.permutations;
     }
 
@@ -200,6 +214,9 @@ mod tests {
     }
 
     fn get_expected_len(nvenc: &Nvenc) -> usize {
-        return nvenc.presets.len() * nvenc.tunes.len() * nvenc.profiles.len() * nvenc.rate_controls.len();
+        return nvenc.presets.len()
+            * nvenc.tunes.len()
+            * nvenc.profiles.len()
+            * nvenc.rate_controls.len();
     }
 }

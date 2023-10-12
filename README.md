@@ -107,7 +107,7 @@ it's highly suggested to use the same version, or at least version `6.*` of ffmp
 3) ffmpeg/ffprobe must be available on your path (tool will error out if it can't find
    either); <a href='https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/'>quick path setup guide for
    Windows
-   10+</a>
+   10+</a>. Note: when following those instructions do make sure to add the `ffmpeg_folder\bin` directory to your path (any other directory will not work)
 4) Download either the **benchmark** tool or the **permutor** tool (depending on your use case) for your platform from
    the <a href='https://github.com/Proryanator/encoder-benchmark/releases'>release section</a> of this repo onto the SSD
    that you wish to run the benchmark on
@@ -722,6 +722,24 @@ Screenshots or log file uploads are much appreciated!
 
 ## Contributing
 
+### Rust Version
 Project is written in Rust, with version `1.66.0` at time of writing.
 
-Setup your dev environment for Rust and you'll be able to contribute.
+### RustRover IDE (suggested by Author)
+
+The author uses <a href='https://www.jetbrains.com/rust/'>RustRover</a> for most of his Rust development, although you're more than welcome to use other IDE's.
+
+#### Setting up automatic formatting via rustfmt in RustRover
+It's suggested that you setup automatic formatting in RustRover to avoid the `rustfmt` job failing and blocking your PR.
+
+Go to Settings -> Languages and Frameworks -> Rust -> Rustfmt, and enable `Use Rustfmt instead of the build-in formatter` and `Run Rustfmt automatically on Save`.
+
+![rustrover-rustfmt.png](docs%2Frustrover-rustfmt.png)
+
+### Visual Studio Code
+
+You can also use VSCode if you want when contributing to the project. Make sure you have the plugin <a href='https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer'>rust-analyzer</a> which seems to already have a built-in formatter for rust.
+
+Just make sure you enable formatting on save via `Settings -> Search for 'format' -> toggle 'Editor: Format On Save'`
+
+![vscode-auto-format.png](docs%2Fvscode-auto-format.png)

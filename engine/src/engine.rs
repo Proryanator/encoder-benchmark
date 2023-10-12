@@ -18,12 +18,27 @@ use crate::progressbar::TrialResult;
 use crate::result::PermutationResult;
 use crate::threads::was_ctrl_c_received;
 
-pub fn run_encode(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>) -> PermutationResult {
-    let mut result = PermutationResult::new(&p.get_metadata(), p.bitrate, &p.encoder_settings, &p.encoder, p.decode_run);
+pub fn run_encode(
+    mut p: Permutation,
+    ctrl_channel: &Result<Receiver<()>, Error>,
+) -> PermutationResult {
+    let mut result = PermutationResult::new(
+        &p.get_metadata(),
+        p.bitrate,
+        &p.encoder_settings,
+        &p.encoder,
+        p.decode_run,
+    );
 
     let metadata = p.get_metadata();
 
-    let mut ffmpeg_args = FfmpegArgs::build_ffmpeg_args(p.video_file, p.encoder, &p.encoder_settings, p.bitrate, p.decode_run);
+    let mut ffmpeg_args = FfmpegArgs::build_ffmpeg_args(
+        p.video_file,
+        p.encoder,
+        &p.encoder_settings,
+        p.bitrate,
+        p.decode_run,
+    );
 
     let encode_start_time = SystemTime::now();
 
@@ -37,7 +52,13 @@ pub fn run_encode(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>
     }
 
     // not sure what to do about these results here
-    let mut trial_result = run_overload_benchmark(&metadata, &ffmpeg_args, p.verbose, p.detect_overload, &ctrl_channel);
+    let mut trial_result = run_overload_benchmark(
+        &metadata,
+        &ffmpeg_args,
+        p.verbose,
+        p.detect_overload,
+        &ctrl_channel,
+    );
 
     // this should be a hard-stop for the program here
     // perhaps abstract this method out
@@ -61,26 +82,50 @@ pub fn run_encode(mut p: Permutation, ctrl_channel: &Result<Receiver<()>, Error>
         // gives time for ffmpeg to release it's hold on the file
         println!("Giving ffmpeg a change to let go of the decode file, hang tight...");
         sleep(Duration::from_secs(5));
-        fs::remove_file(ffmpeg_args.first_input).expect("Not able to delete the file produced by the previous encode");
+        fs::remove_file(ffmpeg_args.first_input)
+            .expect("Not able to delete the file produced by the previous encode");
     }
 
     return result;
 }
 
-pub fn log_permutation_header(index: usize, permutations: &Vec<Permutation>, calc_time: Option<Duration>, ignore_factor: c_float) {
+pub fn log_permutation_header(
+    index: usize,
+    permutations: &Vec<Permutation>,
+    calc_time: Option<Duration>,
+    ignore_factor: c_float,
+) {
     log_header(index, permutations, calc_time, true, ignore_factor);
 }
 
-pub fn log_benchmark_header(index: usize, permutations: &Vec<Permutation>, calc_time: Option<Duration>) {
+pub fn log_benchmark_header(
+    index: usize,
+    permutations: &Vec<Permutation>,
+    calc_time: Option<Duration>,
+) {
     log_header(index, permutations, calc_time, false, 1 as c_float);
 }
 
-fn log_header(index: usize, permutations: &Vec<Permutation>, calc_time: Option<Duration>, log_eta: bool, ignore_factor: c_float) {
+fn log_header(
+    index: usize,
+    permutations: &Vec<Permutation>,
+    calc_time: Option<Duration>,
+    log_eta: bool,
+    ignore_factor: c_float,
+) {
     let mut permutation = permutations[index].clone();
     let metadata = permutation.get_metadata();
     if log_eta {
         if calc_time.is_some() {
-            println!("[ETR: {}]", format_dhms(calculate_eta(calc_time.unwrap(), index, permutations.len(), ignore_factor)));
+            println!(
+                "[ETR: {}]",
+                format_dhms(calculate_eta(
+                    calc_time.unwrap(),
+                    index,
+                    permutations.len(),
+                    ignore_factor
+                ))
+            );
         } else {
             println!("[ETR: Unknown until first permutation is done]");
         }
@@ -101,13 +146,20 @@ fn log_header(index: usize, permutations: &Vec<Permutation>, calc_time: Option<D
     println!("[{}]", permutation.encoder_settings);
 }
 
-pub fn spawn_ffmpeg_child(ffmpeg_args: &FfmpegArgs, verbose: bool, log_error_output: Option<bool>) -> Child {
+pub fn spawn_ffmpeg_child(
+    ffmpeg_args: &FfmpegArgs,
+    verbose: bool,
+    log_error_output: Option<bool>,
+) -> Child {
     // log the full ffmpeg command to be spawned
     if verbose {
         println!("V: ffmpeg args: [{}]", ffmpeg_args.to_string());
         let mut cloned = ffmpeg_args.clone();
         cloned.set_no_output_for_error();
-        println!("V: ffmpeg args no network calls (copy this and run locally, minus the quotes): [{}]", cloned.to_string());
+        println!(
+            "V: ffmpeg args no network calls (copy this and run locally, minus the quotes): [{}]",
+            cloned.to_string()
+        );
     }
 
     let mut effective_ffmpeg_args = ffmpeg_args.clone();
@@ -119,23 +171,34 @@ pub fn spawn_ffmpeg_child(ffmpeg_args: &FfmpegArgs, verbose: bool, log_error_out
     let child = command.args(effective_ffmpeg_args.to_vec());
 
     if log_error_output.is_some() && log_error_output.unwrap() {
-        child.stdout(Stdio::inherit())
-            .stderr(Stdio::inherit());
+        child.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     } else {
-        child.stdout(Stdio::null())
-            .stderr(Stdio::null());
+        child.stdout(Stdio::null()).stderr(Stdio::null());
     }
 
     return child.spawn().expect("Failed to start instance of ffmpeg");
 }
 
-fn run_overload_benchmark(metadata: &MetaData, ffmpeg_args: &FfmpegArgs, verbose: bool, detect_overload: bool, ctrl_channel: &Result<Receiver<()>, Error>) -> TrialResult {
+fn run_overload_benchmark(
+    metadata: &MetaData,
+    ffmpeg_args: &FfmpegArgs,
+    verbose: bool,
+    detect_overload: bool,
+    ctrl_channel: &Result<Receiver<()>, Error>,
+) -> TrialResult {
     let mut child = spawn_ffmpeg_child(ffmpeg_args, verbose, None);
     if verbose {
         println!("V: Successfully spawned encoding child");
     }
 
-    let trial_result = progressbar::watch_encode_progress(metadata.frames, detect_overload, metadata.fps, verbose, ffmpeg_args.stats_period, ctrl_channel);
+    let trial_result = progressbar::watch_encode_progress(
+        metadata.frames,
+        detect_overload,
+        metadata.fps,
+        verbose,
+        ffmpeg_args.stats_period,
+        ctrl_channel,
+    );
 
     if trial_result.ffmpeg_error && !was_ctrl_c_received(&ctrl_channel) {
         let _ = child.kill();
@@ -144,16 +207,23 @@ fn run_overload_benchmark(metadata: &MetaData, ffmpeg_args: &FfmpegArgs, verbose
         // modifying the command just a little bit so that it fails immediately
         let mut child = spawn_ffmpeg_child(&ffmpeg_args, verbose, Option::from(true));
         sleep(Duration::from_secs(20));
-        child.kill().expect("Not able to kill the error ffmpeg thread");
+        child
+            .kill()
+            .expect("Not able to kill the error ffmpeg thread");
     } else if trial_result.was_overloaded && !was_ctrl_c_received(&ctrl_channel) {
         let _ = child.kill();
-        println!("Encoder was overloaded and could not encode the video file in realtime, stopping...");
+        println!(
+            "Encoder was overloaded and could not encode the video file in realtime, stopping..."
+        );
     }
 
     return trial_result;
 }
 
-fn calculate_fps_statistics(permutation_result: &mut PermutationResult, trial_result: &mut TrialResult) {
+fn calculate_fps_statistics(
+    permutation_result: &mut PermutationResult,
+    trial_result: &mut TrialResult,
+) {
     // must use a much larger data type for calculating the average
     let mut sum: u64 = 0;
     for fps in &trial_result.all_fps {
@@ -167,14 +237,20 @@ fn calculate_fps_statistics(permutation_result: &mut PermutationResult, trial_re
 
     // find the index & calculate 1%ile
     let mut index = (0.01 as c_float * trial_result.all_fps.len() as c_float).ceil();
-    permutation_result.fps_stats.one_perc_low = *(trial_result.all_fps.get(index as usize).unwrap());
+    permutation_result.fps_stats.one_perc_low =
+        *(trial_result.all_fps.get(index as usize).unwrap());
 
     // find the index & calculate 90%ile
     index = (0.90 as c_float * trial_result.all_fps.len() as c_float).ceil();
     permutation_result.fps_stats.ninety_perc = *(trial_result.all_fps.get(index as usize).unwrap());
 }
 
-fn calculate_eta(elapsed: Duration, current_perm: usize, total_perms: usize, ignored_factor: c_float) -> usize {
+fn calculate_eta(
+    elapsed: Duration,
+    current_perm: usize,
+    total_perms: usize,
+    ignored_factor: c_float,
+) -> usize {
     let seconds = elapsed.as_secs() as usize;
     let remaining_permutations = total_perms - (current_perm - 1);
     return (((seconds * remaining_permutations) as c_float) * ignored_factor) as usize;

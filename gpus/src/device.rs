@@ -10,7 +10,7 @@ impl Device {
     pub fn new() -> Self {
         return Self {
             brand: Brand::Unknown,
-            name: String::from("")
+            name: String::from(""),
         };
     }
 }

@@ -13,10 +13,16 @@ use ffmpeg::report_files::capture_group;
 static LOCALHOST: &str = "localhost";
 static PORT: &str = "1234";
 
-pub fn start_listening_to_ffmpeg_stats(verbose: bool, frame: &'static AtomicUsize, previous_frame: &'static AtomicUsize) -> StoppableHandle<()> {
+pub fn start_listening_to_ffmpeg_stats(
+    verbose: bool,
+    frame: &'static AtomicUsize,
+    previous_frame: &'static AtomicUsize,
+) -> StoppableHandle<()> {
     let stat_listener = TcpListener::bind(format!("{}:{}", LOCALHOST, PORT)).unwrap();
     // important so that this thread doesn't just hang here
-    stat_listener.set_nonblocking(true).expect("Unable to set non-blocking for tcp listener, listener might block...");
+    stat_listener
+        .set_nonblocking(true)
+        .expect("Unable to set non-blocking for tcp listener, listener might block...");
 
     let tcp_reading_thread;
 
@@ -54,7 +60,11 @@ pub fn start_listening_to_ffmpeg_stats(verbose: bool, frame: &'static AtomicUsiz
     return tcp_reading_thread;
 }
 
-fn spawn_tcp_reading_thread(stream: TcpStream, frame: &'static AtomicUsize, previous_frame: &'static AtomicUsize) -> StoppableHandle<()> {
+fn spawn_tcp_reading_thread(
+    stream: TcpStream,
+    frame: &'static AtomicUsize,
+    previous_frame: &'static AtomicUsize,
+) -> StoppableHandle<()> {
     return stoppable_thread::spawn(move |stopped| {
         let mut reader = BufReader::new(stream.try_clone().unwrap());
 
@@ -69,7 +79,10 @@ fn spawn_tcp_reading_thread(stream: TcpStream, frame: &'static AtomicUsize, prev
 
             if is_frame_line(line.as_str()) {
                 previous_frame.store(frame.load(Ordering::Relaxed), Ordering::Relaxed);
-                frame.store(extract_frame(line.as_str()).unwrap() as usize, Ordering::Relaxed);
+                frame.store(
+                    extract_frame(line.as_str()).unwrap() as usize,
+                    Ordering::Relaxed,
+                );
             }
         }
     });
@@ -80,6 +93,5 @@ fn is_frame_line(input: &str) -> bool {
 }
 
 pub fn extract_frame(line: &str) -> Result<u64, ParseIntError> {
-    return capture_group(line, r"^frame=([0-9]+)")
-        .parse::<u64>();
+    return capture_group(line, r"^frame=([0-9]+)").parse::<u64>();
 }
