@@ -13,7 +13,14 @@ target/
 *.y4m
 *.mp4
 
+# Packaging
+# windows
 *.exe
+# linux
+packaging/linux/aur/encoder-benchmark-git*
+packaging/linux/aur/pkg
+packaging/linux/aur/src
+
 *.pdb
 *.log
 /results.txt
