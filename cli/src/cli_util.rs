@@ -1,3 +1,6 @@
+use figlet_rs::FIGfont;
+use std::fs::File;
+use std::io::Write;
 use std::path::Path;
 use std::{env, fs};
 
@@ -82,4 +85,36 @@ pub fn error_with_ack(ack: bool) {
 
 pub fn pause() {
     dont_disappear::any_key_to_continue::custom_msg("Press any key to close the program...");
+}
+
+pub fn log_cli_header(title: String) {
+    log_tool_title_figlet(title);
+    log_header();
+}
+
+fn log_tool_title_figlet(title: String) {
+    let small_font = include_str!("small.flf");
+    let small_font_content = String::from(small_font);
+
+    let small_font_file_name = "tmp.flf";
+
+    // create the font file to use, then delete it
+    let mut tmp_font_file = File::create(small_font_file_name).unwrap();
+    write!(&mut tmp_font_file, "{}", small_font_content).unwrap();
+
+    let small_font = FIGfont::from_file(small_font_file_name).unwrap();
+    let figure = small_font.convert(title.as_str());
+    assert!(figure.is_some());
+    println!("{}\n", figure.unwrap());
+
+    fs::remove_file(small_font_file_name).expect("Not able to delete tmp file");
+}
+
+fn log_header() {
+    println!("Version: {}", load_version());
+    println!("Source code: https://github.com/Proryanator/encoder-benchmark\n");
+}
+
+fn load_version() -> String {
+    return String::from(env!("CARGO_PKG_VERSION"));
 }

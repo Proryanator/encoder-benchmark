@@ -1,4 +1,5 @@
 use clap::Parser;
+use cli::cli_util::log_cli_header;
 
 use codecs::amf::Amf;
 use codecs::av1_qsv::AV1QSV;
@@ -15,6 +16,7 @@ use crate::permutor_cli::PermutorCli;
 mod permutor_cli;
 
 fn main() {
+    log_cli_header(String::from("Permutation Tool"));
     let mut cli = PermutorCli::parse();
     cli.validate();
 

@@ -723,7 +723,7 @@ Screenshots or log file uploads are much appreciated!
 ## Contributing
 
 ### Rust Version
-Project is written in Rust, with version `1.66.0` at time of writing.
+Project is written in Rust, with version `1.73.0` at time of writing.
 
 ### RustRover IDE (suggested by Author)
 
