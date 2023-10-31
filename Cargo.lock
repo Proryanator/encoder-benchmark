@@ -13,7 +13,7 @@ dependencies = [
 
 [[package]]
 name = "benchmark"
-version = "0.1.0"
+version = "0.6.1"
 dependencies = [
  "clap",
  "cli",
@@ -22,7 +22,6 @@ dependencies = [
  "engine",
  "environment",
  "ffmpeg",
- "figlet-rs",
  "gpus",
  "permutation",
  "text_io",
@@ -85,15 +84,17 @@ dependencies = [
 
 [[package]]
 name = "cli"
-version = "0.1.0"
+version = "0.6.1"
 dependencies = [
  "dont_disappear",
  "environment",
+ "figlet-rs",
+ "markdown-rs",
 ]
 
 [[package]]
 name = "codecs"
-version = "0.1.0"
+version = "0.6.1"
 dependencies = [
  "itertools",
 ]
@@ -297,7 +298,7 @@ checksum = "a357d28ed41a50f9c765dbfe56cbc04a64e53e5fc58ba79fbc34c10ef3df831f"
 
 [[package]]
 name = "engine"
-version = "0.1.0"
+version = "0.6.1"
 dependencies = [
  "cli",
  "compound_duration",
@@ -311,7 +312,7 @@ dependencies = [
 
 [[package]]
 name = "environment"
-version = "0.1.0"
+version = "0.6.1"
 
 [[package]]
 name = "errno"
@@ -336,7 +337,7 @@ dependencies = [
 
 [[package]]
 name = "ffmpeg"
-version = "0.1.0"
+version = "0.6.1"
 dependencies = [
  "codecs",
  "filetime",
@@ -371,7 +372,7 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
 name = "gpus"
-version = "0.1.0"
+version = "0.6.1"
 dependencies = [
  "nvml-wrapper",
 ]
@@ -475,6 +476,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f051f77a7c8e6957c0696eac88f26b0117e54f52d3fc682ab19397a8812846a4"
 
 [[package]]
+name = "markdown-rs"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3ea041fc3a6fb9235217bde03eb9d505eba5d79a8dbee5f08cb4c2e59c4ed9c"
+
+[[package]]
 name = "memchr"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -545,14 +552,14 @@ checksum = "9b7820b9daea5457c9f21c69448905d723fbd21136ccf521748f23fd49e723ee"
 
 [[package]]
 name = "permutation"
-version = "0.1.0"
+version = "0.6.1"
 dependencies = [
  "ffmpeg",
 ]
 
 [[package]]
 name = "permutor-cli"
-version = "0.1.0"
+version = "0.6.1"
 dependencies = [
  "clap",
  "cli",

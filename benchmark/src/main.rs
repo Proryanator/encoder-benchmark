@@ -1,12 +1,9 @@
-use std::fs::File;
-use std::io::Write;
-use std::{env, fs, panic};
+use std::{env, panic};
 
 use clap::Parser;
-use figlet_rs::FIGfont;
 use text_io::read;
 
-use cli::cli_util::{is_dev, pause};
+use cli::cli_util::{is_dev, log_cli_header, pause};
 use cli::supported::{get_supported_encoders, get_supported_inputs};
 use codecs::amf::Amf;
 use codecs::av1_qsv::AV1QSV;
@@ -37,9 +34,7 @@ fn main() {
 }
 
 fn benchmark() {
-    let small_font = include_str!("small.flf");
-
-    fig_title(String::from("Encoder-Benchmark"), String::from(small_font));
+    log_cli_header(String::from("Encoder Benchmark"));
     let mut cli = BenchmarkCli::new();
 
     // check how many Nvidia GPU's there are
@@ -276,21 +271,4 @@ fn map_file(is_dev: bool, s: &&str) -> String {
     }
 
     return file;
-}
-
-fn fig_title(msg: String, small_font_content: String) {
-    let small_font_file_name = "tmp.flf";
-
-    // create the font file to use, then delete it
-    let mut tmp_font_file = File::create(small_font_file_name).unwrap();
-    write!(&mut tmp_font_file, "{}", small_font_content).unwrap();
-
-    let small_font = FIGfont::from_file(small_font_file_name).unwrap();
-    let figure = small_font.convert(msg.as_str());
-    assert!(figure.is_some());
-    println!("{}\n", figure.unwrap());
-    println!("Version v0.6.0-alpha");
-    println!("Source code: https://github.com/Proryanator/encoder-benchmark\n");
-
-    fs::remove_file(small_font_file_name).expect("Not able to delete tmp file");
 }
