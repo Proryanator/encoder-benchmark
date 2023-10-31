@@ -19,7 +19,7 @@ jobs:
       - name: Setup Rust
         uses: ATiltedTree/setup-rust@v1
         with:
-          rust-version: 1.66.0
+          rust-version: 1.73.0
 
       - name: Build
         run:

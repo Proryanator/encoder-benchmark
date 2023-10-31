@@ -43,6 +43,8 @@ jobs:
             target/
           key: ${{inputs.platform}}-${{github.sha}}
 
+      - name: Set Version
+        run: cargo install cargo-edit && cargo set-version ${{inputs.tag}}
       - name: Run Cargo Build
         run:
           cargo build --release
