@@ -6,9 +6,7 @@ use std::{env, fs};
 
 use environment::env::fail_if_environment_not_setup;
 
-use crate::supported::{
-    get_download_url, get_supported_encoders, get_supported_inputs, is_encoder_supported,
-};
+use crate::supported::{get_supported_encoders, get_supported_inputs, is_encoder_supported};
 
 pub fn is_dev() -> bool {
     let args: Vec<String> = env::args().collect();
@@ -69,7 +67,7 @@ pub fn standard_cli_check(
 
     // check if source file exists or not
     if !source_file.is_empty() && !Path::new(source_file.as_str()).exists() {
-        println!("Error: [{}] source file does not exist; if you want to use one of the provided source files, download them from here:\n{}", source_file, get_download_url());
+        println!("Error: [{}] source file does not exist; if you want to use one of the provided source files, download them from the project's readme:\n{}", source_file, get_repo_url());
         error_with_ack(was_ui_opened);
     }
 }
@@ -92,6 +90,10 @@ pub fn log_cli_header(title: String) {
     log_header();
 }
 
+pub fn get_repo_url() -> String {
+    return String::from("https://github.com/Proryanator/encoder-benchmark");
+}
+
 fn log_tool_title_figlet(title: String) {
     let small_font = include_str!("small.flf");
     let small_font_content = String::from(small_font);
@@ -112,7 +114,7 @@ fn log_tool_title_figlet(title: String) {
 
 fn log_header() {
     println!("Version: {}", load_version());
-    println!("Source code: https://github.com/Proryanator/encoder-benchmark\n");
+    println!("Source code: {}\n", get_repo_url());
 }
 
 fn load_version() -> String {

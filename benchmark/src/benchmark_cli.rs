@@ -1,7 +1,9 @@
 use clap::Parser;
 
-use cli::cli_util::{are_all_source_files_present, error_with_ack, standard_cli_check};
-use cli::supported::{get_download_url, get_supported_inputs};
+use cli::cli_util::{
+    are_all_source_files_present, error_with_ack, get_repo_url, standard_cli_check,
+};
+use cli::supported::get_supported_inputs;
 
 #[derive(Parser)]
 pub struct BenchmarkCli {
@@ -56,8 +58,8 @@ impl BenchmarkCli {
         if self.source_file.is_empty() && !are_all_source_files_present() {
             println!("You're missing some video source files to run the standard benchmark; you should have the following: \n{:?}", get_supported_inputs());
             println!(
-                "Please download the ones you are missing from: {}",
-                get_download_url()
+                "Please download the ones you are missing from the project's readme section: {}",
+                get_repo_url()
             );
             println!("If you want to run the tool against a specific resolution/fps, download just that source file and specify it with '-s'");
             error_with_ack(self.was_ui_opened);
