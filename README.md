@@ -11,7 +11,7 @@
 - [Permutor Cli Common Commands and Use Cases](#permutor-cli-common-commands-and-use-cases)
 - [Contributing](#contributing)
 
-If you are curious on research findings or other nitty-gritty details about this project, see the project's <a href='https://github.com/Proryanator/encoder-benchmark/wiki/Expected-Performance-on-Various-Encoding-Hardware'>wiki</a>.
+If you are curious on research findings or other nitty-gritty details about this project, see the project's <a href='https://github.com/Proryanator/encoder-benchmark/wiki'>wiki</a>.
 
 ## Overview
 
