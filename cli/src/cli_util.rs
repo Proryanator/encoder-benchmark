@@ -13,9 +13,16 @@ pub fn is_dev() -> bool {
     return args[0].contains("target");
 }
 
-pub fn get_video_files() -> Vec<String> {
-    let locale = if is_dev() { "../" } else { "." };
+pub fn get_video_files(source_file_directory: &String) -> Vec<String> {
+    let locale = if !source_file_directory.is_empty() {
+        source_file_directory.as_str()
+    } else if is_dev() {
+        "../"
+    } else {
+        "."
+    };
 
+    println!("Using {} for looking up video files: ", locale);
     let paths = fs::read_dir(locale).unwrap();
     return paths
         .filter_map(|e| e.ok())
@@ -24,8 +31,8 @@ pub fn get_video_files() -> Vec<String> {
         .collect::<Vec<String>>();
 }
 
-pub fn are_all_source_files_present() -> bool {
-    let existing_video_files = get_video_files();
+pub fn are_all_source_files_present(source_file_directory: &String) -> bool {
+    let existing_video_files = get_video_files(source_file_directory);
 
     for file in get_supported_inputs() {
         if !existing_video_files.contains(&String::from(file)) {
@@ -40,6 +47,7 @@ pub fn standard_cli_check(
     show_encoders: bool,
     encoder: &String,
     source_file: &String,
+    source_files_directory: &String,
     was_ui_opened: bool,
 ) {
     fail_if_environment_not_setup();
@@ -65,9 +73,15 @@ pub fn standard_cli_check(
         error_with_ack(was_ui_opened);
     }
 
-    // check if source file exists or not
-    if !source_file.is_empty() && !Path::new(source_file.as_str()).exists() {
-        println!("Error: [{}] source file does not exist; if you want to use one of the provided source files, download them from the project's readme:\n{}", source_file, get_repo_url());
+    // determine whether the specified file exists or not; taking source file directory into account
+    let effective_file_path = if !source_files_directory.is_empty() {
+        format!("{}/{}", source_files_directory, source_file)
+    } else {
+        source_file.clone()
+    };
+
+    if !source_file.is_empty() && !Path::new(effective_file_path.as_str()).exists() {
+        println!("Error: [{}] source file does not exist; if you want to use one of the provided source files, download them from the project's readme:\n{}", effective_file_path, get_repo_url());
         error_with_ack(was_ui_opened);
     }
 }

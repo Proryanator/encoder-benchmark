@@ -3,14 +3,22 @@ use std::process::{Command, Stdio};
 use crate::metadata::MetaData;
 
 pub fn probe_for_video_metadata(input_file: &String) -> MetaData {
-    let args = format!("-v error -select_streams v:0 -show_entries stream=duration_ts,r_frame_rate,coded_width,coded_height -of csv=p=0 {}", input_file);
+    // adding the input file later on, prevents the space split breaking the args
+    let args = format!("-v error -select_streams v:0 -show_entries stream=duration_ts,r_frame_rate,coded_width,coded_height -of csv=p=0");
+    let split_args = args.split(" ");
+    let mut vec_args = split_args.collect::<Vec<&str>>();
+    vec_args.push(input_file);
     let ffprobe = Command::new("ffprobe")
-        .args(args.split(" "))
+        .args(vec_args)
         .stdout(Stdio::piped())
         .output()
         .expect("Unable to run ffprobe to collect metadata on the input video file");
 
     let output = String::from_utf8_lossy(&ffprobe.stdout);
+    if output.to_string().is_empty() {
+        panic!("ffprobe was not able to read information on the file; check your file paths for accuracy")
+    }
+
     return extract_metadata(output.to_string());
 }
 

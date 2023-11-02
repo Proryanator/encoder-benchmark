@@ -53,7 +53,7 @@ fn benchmark() {
 
     cli.validate();
 
-    let input_files = get_input_files(cli.source_file.clone());
+    let input_files = get_input_files(cli.source_file.clone(), cli.files_directory.clone());
     let mut engine = BenchmarkEngine::new();
     // prepare permutations for the engine to run over
     for input in input_files {
@@ -250,20 +250,22 @@ fn get_bitrate_for(metadata: &MetaData, string: String) -> u32 {
     }
 }
 
-fn get_input_files(source_file: String) -> Vec<String> {
+fn get_input_files(source_file: String, source_files_directory: String) -> Vec<String> {
     if source_file.is_empty() {
         return get_supported_inputs()
             .iter()
-            .map(|s| map_file(is_dev(), s))
+            .map(|s| map_file(is_dev(), source_files_directory.clone(), s))
             .collect::<Vec<String>>();
     }
 
     return vec![source_file];
 }
 
-fn map_file(is_dev: bool, s: &&str) -> String {
+fn map_file(is_dev: bool, source_files_directory: String, s: &&str) -> String {
     let mut file = String::new();
-    if is_dev {
+    if !source_files_directory.is_empty() {
+        file.push_str(format!("{}/{}", source_files_directory, *s).as_str());
+    } else if is_dev {
         file.push_str("../");
         file.push_str(*s);
     } else {
