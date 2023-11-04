@@ -22,6 +22,12 @@ pub struct PermutorCli {
     /// the source file you wish to benchmark; if not provided, will run standard benchmark on all supported resolutions
     #[arg(short, long, value_name = "source.y4m", default_value = "")]
     pub source_file: String,
+    /// the directory you wish the benchmark to look for your encoder files; can be used with --source_file/-s if you wish
+    #[arg(short, long, value_name = "folder/to/files", default_value = "")]
+    pub files_directory: String,
+    /// the directory you wish for the logs this tool produces to go into; defaults to the current directory. Does NOT support spaces in directories
+    #[arg(long, value_name = "folder/to/log/output", default_value = "")]
+    pub log_output_directory: String,
     /// runs just the first permutation for given encoder; useful for testing the tool & output
     #[arg(short, long)]
     pub test_run: bool,
@@ -45,6 +51,7 @@ impl PermutorCli {
             self.list_supported_encoders,
             &self.encoder,
             &self.source_file,
+            &self.files_directory,
             false,
         );
 
@@ -55,6 +62,11 @@ impl PermutorCli {
 
         if self.max_bitrate_permutation.is_none() {
             self.max_bitrate_permutation = Option::from(self.bitrate);
+        }
+
+        if self.source_file.is_empty() && !self.files_directory.is_empty() {
+            // internally map the source_file and source_files_directory together
+            self.source_file = format!("{}/{}", self.files_directory, self.source_file);
         }
     }
 

@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::{env, panic};
 
 use clap::Parser;
@@ -53,8 +54,9 @@ fn benchmark() {
 
     cli.validate();
 
-    let input_files = get_input_files(cli.source_file.clone());
-    let mut engine = BenchmarkEngine::new();
+    let input_files = get_input_files(cli.source_file.clone(), cli.files_directory.clone());
+    let mut engine = BenchmarkEngine::new(cli.log_output_directory.clone());
+
     // prepare permutations for the engine to run over
     for input in input_files {
         let mut permutation = Permutation::new(input, cli.encoder.clone());
@@ -159,6 +161,38 @@ fn read_user_input(cli: &mut BenchmarkCli, gpus: Vec<String>) {
         }
     }
 
+    // user may specify a directory for the source files
+    let mut in_current_dir = false;
+    loop {
+        print!("\nAre the source files in the current directory? [y/n]: ");
+        let in_current_directory: String = read!("{}");
+        if in_current_directory != "n" && in_current_directory != "y" {
+            println!("Invalid input, try again...");
+        } else {
+            if in_current_directory == "y" {
+                in_current_dir = true;
+            }
+
+            break;
+        }
+
+        break;
+    }
+
+    if !in_current_dir {
+        loop {
+            print!("\nPlease specify the input source file directory: ");
+            let source_files_directory: String = read!("{}");
+
+            if !(Path::new(source_files_directory.as_str()).exists()) {
+                print!("The provided directory does not exist, please check your input and try again...")
+            } else {
+                cli.files_directory = source_files_directory;
+                break;
+            }
+        }
+    }
+
     if !full_bench {
         loop {
             print_options(get_supported_inputs().to_vec());
@@ -250,20 +284,22 @@ fn get_bitrate_for(metadata: &MetaData, string: String) -> u32 {
     }
 }
 
-fn get_input_files(source_file: String) -> Vec<String> {
+fn get_input_files(source_file: String, source_files_directory: String) -> Vec<String> {
     if source_file.is_empty() {
         return get_supported_inputs()
             .iter()
-            .map(|s| map_file(is_dev(), s))
+            .map(|s| map_file(is_dev(), source_files_directory.clone(), s))
             .collect::<Vec<String>>();
     }
 
     return vec![source_file];
 }
 
-fn map_file(is_dev: bool, s: &&str) -> String {
+fn map_file(is_dev: bool, source_files_directory: String, s: &&str) -> String {
     let mut file = String::new();
-    if is_dev {
+    if !source_files_directory.is_empty() {
+        file.push_str(format!("{}/{}", source_files_directory, *s).as_str());
+    } else if is_dev {
         file.push_str("../");
         file.push_str(*s);
     } else {

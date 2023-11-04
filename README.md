@@ -222,7 +222,7 @@ streaming at a target resolution & framerate.
 ### Identifying the minimum bitrate needed to achieve visually lossless video quality
 
 If you are unsure on the definition of visually lossless quality,
-see [Visually Lossless Terminology](#visually-lossless-terminology).
+see the wiki's terminology section.
 
 To find the minimum bitrate & encoder settings needed to achieve visually lossless quality, you would run something like
 the following:

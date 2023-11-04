@@ -1,6 +1,6 @@
 use clap::Parser;
-use cli::cli_util::log_cli_header;
 
+use cli::cli_util::log_cli_header;
 use codecs::amf::Amf;
 use codecs::av1_qsv::AV1QSV;
 use codecs::get_vendor_for_codec;
@@ -22,7 +22,7 @@ fn main() {
 
     log_special_arguments(&cli);
 
-    let mut engine = PermutationEngine::new();
+    let mut engine = PermutationEngine::new(cli.log_output_directory.clone());
     let vendor = get_vendor_for_codec(&cli.encoder.clone());
     for bitrate in get_bitrate_permutations(cli.bitrate, cli.max_bitrate_permutation.unwrap()) {
         match vendor {
