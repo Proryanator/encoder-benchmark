@@ -72,7 +72,7 @@ impl BenchmarkCli {
             error_with_ack(self.was_ui_opened);
         }
 
-        if self.files_directory.is_empty() && !self.files_directory.is_empty() {
+        if self.source_file.is_empty() && !self.files_directory.is_empty() {
             // internally map the source_file and source_files_directory together
             self.source_file = format!("{}/{}", self.files_directory, self.source_file);
         }

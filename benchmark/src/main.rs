@@ -1,4 +1,5 @@
 use std::{env, panic};
+use std::path::Path;
 
 use clap::Parser;
 use text_io::read;
@@ -156,6 +157,38 @@ fn read_user_input(cli: &mut BenchmarkCli, gpus: Vec<String>) {
             }
 
             break;
+        }
+    }
+
+    // user may specify a directory for the source files
+    let mut in_current_dir = false;
+    loop {
+        print!("\nAre the source files in the current directory? [y/n]: ");
+        let in_current_directory: String = read!("{}");
+        if in_current_directory != "n" && in_current_directory != "y" {
+            println!("Invalid input, try again...");
+        } else {
+            if in_current_directory == "y" {
+                in_current_dir = true;
+            }
+
+            break;
+        }
+
+        break;
+    }
+
+    if !in_current_dir {
+        loop {
+            print!("\nPlease specify the input source file directory: ");
+            let source_files_directory: String = read!("{}");
+
+            if !(Path::new(source_files_directory.as_str()).exists()) {
+                print!("The provided directory does not exist, please check your input and try again...")
+            } else {
+                cli.files_directory = source_files_directory;
+                break;
+            }
         }
     }
 
