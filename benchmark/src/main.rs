@@ -1,5 +1,5 @@
-use std::{env, panic};
 use std::path::Path;
+use std::{env, panic};
 
 use clap::Parser;
 use text_io::read;

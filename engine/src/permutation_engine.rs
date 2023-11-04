@@ -79,7 +79,7 @@ impl PermutationEngine {
                     permutation.verbose,
                     i,
                 )
-                    .expect("Failed to check encode quality");
+                .expect("Failed to check encode quality");
 
                 result.vmaf_calculation_time = vmaf_start_time.elapsed().unwrap().as_secs();
 
