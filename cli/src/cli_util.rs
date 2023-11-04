@@ -1,8 +1,9 @@
-use figlet_rs::FIGfont;
+use std::{env, fs};
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
-use std::{env, fs};
+
+use figlet_rs::FIGfont;
 
 use environment::env::fail_if_environment_not_setup;
 
@@ -22,7 +23,6 @@ pub fn get_video_files(source_file_directory: &String) -> Vec<String> {
         "."
     };
 
-    println!("Using {} for looking up video files: ", locale);
     let paths = fs::read_dir(locale).unwrap();
     return paths
         .filter_map(|e| e.ok())
