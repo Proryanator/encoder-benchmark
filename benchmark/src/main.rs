@@ -55,7 +55,8 @@ fn benchmark() {
     cli.validate();
 
     let input_files = get_input_files(cli.source_file.clone(), cli.files_directory.clone());
-    let mut engine = BenchmarkEngine::new();
+    let mut engine = BenchmarkEngine::new(cli.log_output_directory.clone());
+
     // prepare permutations for the engine to run over
     for input in input_files {
         let mut permutation = Permutation::new(input, cli.encoder.clone());

@@ -58,7 +58,7 @@ impl PermutationResult {
                 self.metadata.fps,
                 self.bitrate
             )
-            .as_str(),
+                .as_str(),
         );
 
         // adjust tabs based on expected vmaf score, or lack of one
@@ -88,7 +88,7 @@ impl PermutationResult {
                 self.fps_stats.ninety_perc,
                 effective_settings
             )
-            .as_str(),
+                .as_str(),
         );
 
         return default;
@@ -101,6 +101,7 @@ pub fn log_results_to_file(
     dup_results: Vec<PermutationResult>,
     bitrate: u32,
     is_benchmark: bool,
+    log_directory: &String,
 ) {
     // might make this naming here more robust eventually
     let first_metadata = results.get(0).unwrap().metadata;
@@ -111,13 +112,18 @@ pub fn log_results_to_file(
         first_metadata.get_res(),
         first_metadata.fps
     )
-    .to_string();
+        .to_string();
     let benchmark_file_name = format!("{}-benchmark.log", encoder).to_string();
-    let file_name = if is_benchmark {
+    let mut file_name = if is_benchmark {
         benchmark_file_name
     } else {
         permute_file_name
     };
+
+    // if an output directory was provided, we'll append that
+    if !log_directory.is_empty() {
+        file_name = format!("{}/{}", log_directory, file_name);
+    }
 
     let mut w = File::create(file_name).unwrap();
 

@@ -19,6 +19,9 @@ pub struct BenchmarkCli {
     /// the directory you wish the benchmark to look for your encoder files; can be used with --source_file/-s if you wish. Does NOT support spaces in directories
     #[arg(short, long, value_name = "folder/to/files", default_value = "")]
     pub files_directory: String,
+    /// the directory you wish for the logs this tool produces to go into; defaults to the current directory. Note: does not change the location of temporary log files (like the ones ffmpeg makes)
+    #[arg(long, value_name = "folder/to/log/output", default_value = "")]
+    pub log_output_directory: String,
     /// logs useful information to help troubleshooting
     #[arg(short, long)]
     pub verbose: bool,
@@ -45,6 +48,7 @@ impl BenchmarkCli {
             encoder: String::from(""),
             source_file: String::from(""),
             files_directory: String::from(""),
+            log_output_directory: String::from(""),
             verbose: false,
             gpu: 0,
             decode: false,

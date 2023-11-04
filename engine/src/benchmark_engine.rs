@@ -11,13 +11,15 @@ use crate::threads::setup_ctrl_channel;
 pub struct BenchmarkEngine {
     permutations: Vec<Permutation>,
     results: Vec<PermutationResult>,
+    log_files_directory: String,
 }
 
 impl BenchmarkEngine {
-    pub fn new() -> Self {
+    pub fn new(log_files: String) -> Self {
         return Self {
             permutations: vec![],
             results: vec![],
+            log_files_directory: log_files,
         };
     }
 
@@ -44,6 +46,7 @@ impl BenchmarkEngine {
             Vec::new(),
             self.permutations[0].bitrate,
             true,
+            &self.log_files_directory,
         );
         println!("Benchmark runtime: {}", runtime_str);
     }

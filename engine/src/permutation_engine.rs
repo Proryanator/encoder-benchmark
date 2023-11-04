@@ -30,17 +30,19 @@ pub struct PermutationEngine {
     results: Vec<PermutationResult>,
     dup_results: Vec<PermutationResult>,
     vmaf_scores: HashSet<String>,
+    log_files_directory: String,
 }
 
 // note: we can make 2 engines; benchmark engine, and the permutation engine
 // this way we can make the run() method a lot less complex
 impl PermutationEngine {
-    pub fn new() -> Self {
+    pub fn new(log_files: String) -> Self {
         return Self {
             permutations: vec![],
             results: vec![],
             dup_results: vec![],
             vmaf_scores: HashSet::new(),
+            log_files_directory: log_files,
         };
     }
 
@@ -77,7 +79,7 @@ impl PermutationEngine {
                     permutation.verbose,
                     i,
                 )
-                .expect("Failed to check encode quality");
+                    .expect("Failed to check encode quality");
 
                 result.vmaf_calculation_time = vmaf_start_time.elapsed().unwrap().as_secs();
 
@@ -124,6 +126,7 @@ impl PermutationEngine {
             self.dup_results.clone(),
             self.permutations[0].bitrate,
             false,
+            &self.log_files_directory,
         );
         println!("Benchmark runtime: {}", runtime_str);
     }
