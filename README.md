@@ -61,6 +61,7 @@ supported.
 - ***AMD H264/HEVC** (h264_amf, hevc_amf)
 - **Intel Quick Sync Video H264/HEVC** (h264_qsv, hevc_qsv)
 - ***Intel Arc AV1** (av1_qsv)
+- **Apple Silicon H264/HEVC (h264_videotoolbox, hevc_videotoolbox)**
 
 ## Minimum system specs suggested
 
@@ -349,6 +350,7 @@ This will make the cli tool aware of the new encoder.
    existing methods at the bottom).
 5. Update the `main` method in `permutor-cli/src/main.rs` to now call your newly added init() method depending on the
    vendor
+6. Update `Supported Encoders` section of the readme for full transparency of the supported encoders
 
 #### Implementing the Permutation Engine for the Encoder
 
