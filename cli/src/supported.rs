@@ -1,4 +1,4 @@
-const SUPPORTED_ENCODERS: [&'static str; 7] = [
+const SUPPORTED_ENCODERS: [&'static str; 10] = [
     "h264_nvenc",
     "hevc_nvenc",
     "h264_amf",
@@ -6,6 +6,9 @@ const SUPPORTED_ENCODERS: [&'static str; 7] = [
     "h264_qsv",
     "hevc_qsv",
     "av1_qsv",
+    "h264_videotoolbox",
+    "hevc_videotoolbox",
+    "prores_videotoolbox"
 ];
 
 const ENCODE_FILES: [&'static str; 8] = [
@@ -23,7 +26,7 @@ pub fn is_encoder_supported(potential_encoder: &String) -> bool {
     return SUPPORTED_ENCODERS.contains(&potential_encoder.as_str());
 }
 
-pub fn get_supported_encoders() -> [&'static str; 7] {
+pub fn get_supported_encoders() -> [&'static str; 10] {
     return SUPPORTED_ENCODERS;
 }
 

@@ -102,6 +102,8 @@ impl FfmpegArgs {
                 Vendor::Nvidia => "cuda",
                 Vendor::AMD => "d3d11va",
                 Vendor::IntelQSV => "qsv",
+                // TODO: implement this
+                Vendor::Apple => "apple",
                 Vendor::Unknown => "error",
             };
 
