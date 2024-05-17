@@ -8,7 +8,7 @@ const SUPPORTED_ENCODERS: [&'static str; 10] = [
     "av1_qsv",
     "h264_videotoolbox",
     "hevc_videotoolbox",
-    "prores_videotoolbox"
+    "prores_videotoolbox",
 ];
 
 const ENCODE_FILES: [&'static str; 8] = [

@@ -225,7 +225,11 @@ fn calc_vmaf_score(
     let vmaf_log_file = get_latest_ffmpeg_report_file();
     // TODO: this does fix the issue for apple however, this may not scale very well across other vendors
     // or the output line number may have changed recently where we'll need to make this not dependent on line numbers at all
-    let line_number = if encoder_args.encoder.contains("videotoolbox") {15} else {3};
+    let line_number = if encoder_args.encoder.contains("videotoolbox") {
+        15
+    } else {
+        3
+    };
     let vmaf_score_line = read_last_line_at(line_number);
     //Cleanup process
     encoder_child
