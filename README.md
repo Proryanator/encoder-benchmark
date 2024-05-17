@@ -61,7 +61,12 @@ supported.
 - ***AMD H264/HEVC** (h264_amf, hevc_amf)
 - **Intel Quick Sync Video H264/HEVC** (h264_qsv, hevc_qsv)
 - ***Intel Arc AV1** (av1_qsv)
-- **Apple Silicon H264/HEVC (h264_videotoolbox, hevc_videotoolbox)**
+- **Apple Silicon H264/HEVC permutations (h264_videotoolbox, hevc_videotoolbox)**
+
+The following have code in the project to 'support it' but currently <i>do not</i> function correctly.
+
+- **Apple Silicon Benchmarks of Any Kind** (just don't work right now)
+- **Apple Silicon ProRes (prores_videotoolbox)**
 
 ## Minimum system specs suggested
 
