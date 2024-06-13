@@ -31,6 +31,9 @@ pub struct BenchmarkCli {
     /// whether to run decode benchmark as well; defaults to off, as this will take up more storage space
     #[arg(short, long)]
     pub decode: bool,
+    /// adds in '-pix_fmt yuv420p10le' to force 10-bit encoding
+    #[arg(short, long)]
+    pub ten_bit: bool,
     // this is an internal option not intended to be exposed to the end user
     #[arg(short, long, hide = true)]
     was_ui_opened: bool,
@@ -52,6 +55,7 @@ impl BenchmarkCli {
             verbose: false,
             gpu: 0,
             decode: false,
+            ten_bit: false,
             was_ui_opened: false,
         };
     }

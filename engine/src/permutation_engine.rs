@@ -177,6 +177,7 @@ fn calc_vmaf_score(
         &p.encoder_settings,
         p.bitrate.clone(),
         p.decode_run,
+        p.ten_bit,
     );
 
     println!(

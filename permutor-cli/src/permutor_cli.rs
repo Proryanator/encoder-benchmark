@@ -31,6 +31,9 @@ pub struct PermutorCli {
     /// runs just the first permutation for given encoder; useful for testing the tool & output
     #[arg(short, long)]
     pub test_run: bool,
+    /// adds in '-pix_fmt yuv420p10le' to force 10-bit encoding
+    #[arg(long)]
+    pub ten_bit: bool,
     /// maximum value to increase the bitrate to (in 5Mb/s intervals); if not specified, tool will not permute over bitrate values
     #[arg(short, long, value_name = "bitrate")]
     pub max_bitrate_permutation: Option<u32>,

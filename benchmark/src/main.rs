@@ -1,5 +1,5 @@
-use std::path::Path;
 use std::{env, panic};
+use std::path::Path;
 
 use clap::Parser;
 use text_io::read;
@@ -71,6 +71,10 @@ fn benchmark() {
         // tell this encode run that we'll want to preserve the file output
         if cli.decode {
             permutation.is_decoding = true;
+        }
+
+        if cli.ten_bit {
+            permutation.ten_bit = true;
         }
 
         engine.add(permutation.clone());
