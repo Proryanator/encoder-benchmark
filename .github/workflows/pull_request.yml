@@ -15,10 +15,10 @@ jobs:
     with:
       platform: windows-2022
 
-  #linux:
-  #  uses: ./.github/workflows/pull_request_workflow.yml
-  #  with:
-  #    platform: ubuntu-20.04
+  linux:
+    uses: ./.github/workflows/pull_request_workflow.yml
+    with:
+      platform: ubuntu-22.04
 
   #mac:
   #  uses: ./.github/workflows/pull_request_workflow.yml
