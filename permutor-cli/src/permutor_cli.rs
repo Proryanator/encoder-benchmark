@@ -31,6 +31,9 @@ pub struct PermutorCli {
     /// runs just the first permutation for given encoder; useful for testing the tool & output
     #[arg(short, long)]
     pub test_run: bool,
+    /// adds in '-pix_fmt yuv420p10le' to force 10-bit encoding
+    #[arg(long)]
+    pub ten_bit: bool,
     /// maximum value to increase the bitrate to (in 5Mb/s intervals); if not specified, tool will not permute over bitrate values
     #[arg(short, long, value_name = "bitrate")]
     pub max_bitrate_permutation: Option<u32>,
@@ -43,6 +46,9 @@ pub struct PermutorCli {
     /// the GPU you wish to run the encode on; defaults to the first/only GPU found in your system
     #[arg(short, long, default_value = "0")]
     pub gpu: u8,
+    /// opt-out of using b frames for either H264 or HEVC encoders; currently only supported for Nvidia GPUs
+    #[arg(short, long)]
+    pub no_b_frame: bool,
 }
 
 impl PermutorCli {

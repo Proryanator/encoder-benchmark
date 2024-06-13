@@ -73,6 +73,10 @@ fn benchmark() {
             permutation.is_decoding = true;
         }
 
+        if cli.ten_bit {
+            permutation.ten_bit = true;
+        }
+
         engine.add(permutation.clone());
 
         if cli.decode {
@@ -248,7 +252,7 @@ fn get_benchmark_settings_for(cli: &BenchmarkCli) -> String {
 
     return match vendor {
         Vendor::Nvidia => {
-            let nvenc = Nvenc::new(cli.encoder == "hevc_nvenc", cli.gpu);
+            let nvenc = Nvenc::new(cli.encoder == "hevc_nvenc", cli.gpu, cli.no_b_frame);
             nvenc.get_benchmark_settings()
         }
 

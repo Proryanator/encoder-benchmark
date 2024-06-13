@@ -20,6 +20,7 @@ pub struct FfmpegArgs {
     pub is_vmaf: bool,
     pub stats_period: c_float,
     pub decode: bool,
+    pub ten_bit: bool,
 }
 
 impl Default for FfmpegArgs {
@@ -39,6 +40,7 @@ impl Default for FfmpegArgs {
             // but your fps calculations might be a little over-inflated
             stats_period: 0.5,
             decode: false,
+            ten_bit: false,
         }
     }
 }
@@ -50,6 +52,7 @@ impl FfmpegArgs {
         encoder_args: &String,
         current_bitrate: u32,
         decode: bool,
+        ten_bit: bool,
     ) -> FfmpegArgs {
         let ffmpeg_args = FfmpegArgs {
             first_input,
@@ -57,6 +60,7 @@ impl FfmpegArgs {
             encoder,
             encoder_args: encoder_args.to_string(),
             decode,
+            ten_bit,
             ..Default::default()
         };
 
@@ -142,6 +146,12 @@ impl FfmpegArgs {
                     &self.encoder_args,
                 );
             }
+        }
+
+        // add in pixel format of 10-bit if specified
+        if self.ten_bit {
+            output.push(' ');
+            output.push_str("-pix_fmt yuv420p10le");
         }
 
         output.push(' ');
@@ -327,6 +337,7 @@ mod tests {
             args.encoder,
             &ENCODER_ARGS.to_string(),
             args.bitrate,
+            false,
             false,
         );
     }

@@ -14,6 +14,7 @@ pub struct Permutation {
     pub verbose: bool,
     // determines whether this permutation is the decode run or not
     pub decode_run: bool,
+    pub ten_bit: bool,
     // whether we are doing any decoding at all
     pub is_decoding: bool,
 }
@@ -32,6 +33,7 @@ impl Permutation {
             verbose: false,
             decode_run: false,
             is_decoding: false,
+            ten_bit: false,
         }
     }
 

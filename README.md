@@ -61,9 +61,9 @@ supported.
 - ***AMD H264/HEVC** (h264_amf, hevc_amf)
 - **Intel Quick Sync Video H264/HEVC** (h264_qsv, hevc_qsv)
 - ***Intel Arc AV1** (av1_qsv)
-- **Apple Silicon H264/HEVC permutations (h264_videotoolbox, hevc_videotoolbox)**
+- **Apple Silicon H264/HEVC** (h264_videotoolbox, hevc_videotoolbox)
 
-The following have code in the project to 'support it' but currently <i>do not</i> function correctly.
+The following have code in the project to 'support it' but currently <i>do not</i> function correctly:
 
 - **Apple Silicon Benchmarks of Any Kind** (just don't work right now)
 - **Apple Silicon ProRes (prores_videotoolbox)**
@@ -71,8 +71,8 @@ The following have code in the project to 'support it' but currently <i>do not</
 ## Minimum system specs suggested
 
 - <b>OS:</b> Windows, Mac or Linux
-- <b>Processor:</b> CPU with at least 6 cores (for macbooks, Intel _should_ work, but Apple Silicon for sure has been tested)
-- <b>GPU:</b> Nvidia GPU w/ a hardware encoder, in the main x16 PCI slot of your PC (for max PCI bandwidth)
+- <b>Processor:</b> CPU with at least 6 cores (for MacBooks, Intel macs _should_ work, but Apple Silicon for sure has been tested)
+- <b>GPU:</b> Nvidia/AMD/Intel Arc GPU w/ a hardware encoder, in the main x16 PCI slot of your PC (for max PCI bandwidth), iGPU, or integrated GPUs on Apple Silicon  
 - <b>Memory:</b> >= 8GB RAM (higher is always better)
 - <b>Storage Space:</b> 3-12GB depending on target resolution/framerate, 90GB for the full benchmark
 - <b>Extra Space:</b> When running encode & decode benchmark, allow for 12GB of additional free space (on top of 90GB)
@@ -86,7 +86,7 @@ A nice cross-platform tool to test your SSD's sequential read speeds: <a href='h
 Bench</a>
 
 Note: the tool _does_ support selecting a specific GPU in your system if you have more than one, but you may experience
-PCI bottlen-ecking for GPU's not in the primary slot.
+PCI bottlen-ecking for GPU's not in the primary slot. This multi-gpu feature has not been tested on Mac or Linux.
 
 ### Important notes about your system
 
@@ -96,6 +96,7 @@ PCI bottlen-ecking for GPU's not in the primary slot.
   free to have more than 1 for your testing (although the benchmark would only run against one)
 - the tool does _not_ support multiple AMD GPU's for the benchmark tool, but you are able to still specify _-gpu_ with
   the permutor-cli tool
+- the tool does _not_ support multiple GPU's on Mac officially (although if may work if you tried)
 - for AV1 on Intel Arc, make sure the monitor plugged into the Arc GPU is your primary monitor, otherwise ffmpeg may not
   use/pickup the GPU
 

@@ -38,6 +38,7 @@ pub fn run_encode(
         &p.encoder_settings,
         p.bitrate,
         p.decode_run,
+        p.ten_bit,
     );
 
     let encode_start_time = SystemTime::now();

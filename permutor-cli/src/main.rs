@@ -80,7 +80,7 @@ fn build_nvenc_setting_permutations(
     cli: &PermutorCli,
     bitrate: u32,
 ) {
-    let mut nvenc = Nvenc::new(cli.encoder == "hevc_nvenc", cli.gpu);
+    let mut nvenc = Nvenc::new(cli.encoder == "hevc_nvenc", cli.gpu, cli.no_b_frame);
 
     // initialize the permutations each time
     nvenc.init();
@@ -95,6 +95,7 @@ fn build_nvenc_setting_permutations(
         permutation.detect_overload = cli.detect_overload;
         permutation.allow_duplicates = cli.allow_duplicate_scores;
         permutation.verbose = cli.verbose;
+        permutation.ten_bit = cli.ten_bit;
         engine.add(permutation);
 
         // break out early here to just make 1 permutation
@@ -119,6 +120,7 @@ fn build_amf_setting_permutations(engine: &mut PermutationEngine, cli: &Permutor
         permutation.verbose = cli.verbose;
         permutation.detect_overload = cli.detect_overload;
         permutation.allow_duplicates = cli.allow_duplicate_scores;
+        permutation.ten_bit = cli.ten_bit;
         engine.add(permutation);
 
         // break out early here to just make 1 permutation
@@ -143,6 +145,7 @@ fn build_intel_av1_permutations(engine: &mut PermutationEngine, cli: &PermutorCl
         permutation.verbose = cli.verbose;
         permutation.detect_overload = cli.detect_overload;
         permutation.allow_duplicates = cli.allow_duplicate_scores;
+        permutation.ten_bit = cli.ten_bit;
         engine.add(permutation);
 
         // break out early here to just make 1 permutation
@@ -167,6 +170,7 @@ fn build_intel_igpu_permutations(engine: &mut PermutationEngine, cli: &PermutorC
         permutation.verbose = cli.verbose;
         permutation.detect_overload = cli.detect_overload;
         permutation.allow_duplicates = cli.allow_duplicate_scores;
+        permutation.ten_bit = cli.ten_bit;
         engine.add(permutation);
 
         // break out early here to just make 1 permutation
@@ -199,6 +203,7 @@ fn build_apple_silicon_h264_permutations(
         permutation.verbose = cli.verbose;
         permutation.detect_overload = cli.detect_overload;
         permutation.allow_duplicates = cli.allow_duplicate_scores;
+        permutation.ten_bit = cli.ten_bit;
         engine.add(permutation);
 
         // break out early here to just make 1 permutation
