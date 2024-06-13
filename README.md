@@ -70,8 +70,8 @@ The following have code in the project to 'support it' but currently <i>do not</
 
 ## Minimum system specs suggested
 
-- <b>OS:</b> Windows (will support more OS's eventually)
-- <b>Processor:</b> CPU with at least 6 cores
+- <b>OS:</b> Windows, Mac or Linux
+- <b>Processor:</b> CPU with at least 6 cores (for macbooks, Intel _should_ work, but Apple Silicon for sure has been tested)
 - <b>GPU:</b> Nvidia GPU w/ a hardware encoder, in the main x16 PCI slot of your PC (for max PCI bandwidth)
 - <b>Memory:</b> >= 8GB RAM (higher is always better)
 - <b>Storage Space:</b> 3-12GB depending on target resolution/framerate, 90GB for the full benchmark
@@ -86,7 +86,7 @@ A nice cross-platform tool to test your SSD's sequential read speeds: <a href='h
 Bench</a>
 
 Note: the tool _does_ support selecting a specific GPU in your system if you have more than one, but you may experience
-PCI bottlenecking for GPU's not in the primary slot.
+PCI bottlen-ecking for GPU's not in the primary slot.
 
 ### Important notes about your system
 
