@@ -120,6 +120,7 @@ impl PermutationEngine {
 
         // produce output files and other logging here
         let runtime_str = format_dhms(runtime.elapsed().unwrap().as_secs());
+
         log_results_to_file(
             self.results.clone(),
             &runtime_str,
@@ -222,7 +223,14 @@ fn calc_vmaf_score(
     println!("VMAF calculation finishing up...");
     let vmaf_child_status = vmaf_child.wait().expect("Vmaf child could not wait");
     let vmaf_log_file = get_latest_ffmpeg_report_file();
-    let vmaf_score_line = read_last_line_at(3);
+    // TODO: this does fix the issue for apple however, this may not scale very well across other vendors
+    // or the output line number may have changed recently where we'll need to make this not dependent on line numbers at all
+    let line_number = if encoder_args.encoder.contains("videotoolbox") {
+        15
+    } else {
+        3
+    };
+    let vmaf_score_line = read_last_line_at(line_number);
     //Cleanup process
     encoder_child
         .kill()

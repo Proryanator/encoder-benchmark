@@ -203,6 +203,7 @@ fn run_overload_benchmark(
     if trial_result.ffmpeg_error && !was_ctrl_c_received(&ctrl_channel) {
         let _ = child.kill();
         eprintln!("Ffmpeg encountered an error when attempting to run, double-check that your environment is setup correctly. If so, open an issue in github!");
+        eprintln!("See below re-creation of the ffmpeg error...");
         // spawn the ffmpeg command, with output logged so we can troubleshoot better
         // modifying the command just a little bit so that it fails immediately
         let mut child = spawn_ffmpeg_child(&ffmpeg_args, verbose, Option::from(true));

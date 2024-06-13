@@ -7,6 +7,7 @@ use text_io::read;
 use cli::cli_util::{is_dev, log_cli_header, pause};
 use cli::supported::{get_supported_encoders, get_supported_inputs};
 use codecs::amf::Amf;
+use codecs::apple_silicon::Apple;
 use codecs::av1_qsv::AV1QSV;
 use codecs::get_vendor_for_codec;
 use codecs::nvenc::Nvenc;
@@ -263,6 +264,18 @@ fn get_benchmark_settings_for(cli: &BenchmarkCli) -> String {
             } else {
                 let intel_qsv = QSV::new(cli.encoder == "hevc_qsv");
                 intel_qsv.get_benchmark_settings()
+            }
+        }
+        Vendor::Apple => {
+            if cli.encoder.contains("h264") {
+                let apple = Apple::new(true, false);
+                apple.get_benchmark_settings()
+            } else if cli.encoder.contains("hevc") {
+                let apple_h264 = Apple::new(false, false);
+                apple_h264.get_benchmark_settings()
+            } else {
+                let apple_h264 = Apple::new(false, true);
+                apple_h264.get_benchmark_settings()
             }
         }
         Vendor::Unknown => {

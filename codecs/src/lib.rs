@@ -1,6 +1,7 @@
 use crate::vendor::Vendor;
 
 pub mod amf;
+pub mod apple_silicon;
 pub mod av1_qsv;
 pub mod nvenc;
 pub mod permute;
@@ -16,6 +17,8 @@ pub fn get_vendor_for_codec(codec: &String) -> Vendor {
     } else if codec.contains("h264_qsv") || codec.contains("hevc_qsv") || codec.contains("av1_qsv")
     {
         return Vendor::IntelQSV;
+    } else if codec.contains("videotoolbox") {
+        return Vendor::Apple;
     }
 
     return Vendor::Unknown;

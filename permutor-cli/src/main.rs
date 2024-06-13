@@ -2,6 +2,7 @@ use clap::Parser;
 
 use cli::cli_util::log_cli_header;
 use codecs::amf::Amf;
+use codecs::apple_silicon::Apple;
 use codecs::av1_qsv::AV1QSV;
 use codecs::get_vendor_for_codec;
 use codecs::nvenc::Nvenc;
@@ -38,6 +39,9 @@ fn main() {
                 } else {
                     build_intel_igpu_permutations(&mut engine, &cli, bitrate);
                 }
+            }
+            Vendor::Apple => {
+                build_apple_silicon_h264_permutations(&mut engine, &cli, bitrate);
             }
             Vendor::Unknown => {}
         }
@@ -155,6 +159,38 @@ fn build_intel_igpu_permutations(engine: &mut PermutationEngine, cli: &PermutorC
     intel_i_gpu.init();
 
     while let Some((_encoder_index, settings)) = intel_i_gpu.next() {
+        let mut permutation = Permutation::new(cli.source_file.clone(), cli.encoder.clone());
+        permutation.video_file = cli.source_file.clone();
+        permutation.encoder_settings = settings;
+        permutation.bitrate = bitrate;
+        permutation.check_quality = cli.check_quality;
+        permutation.verbose = cli.verbose;
+        permutation.detect_overload = cli.detect_overload;
+        permutation.allow_duplicates = cli.allow_duplicate_scores;
+        engine.add(permutation);
+
+        // break out early here to just make 1 permutation
+        if cli.test_run {
+            break;
+        }
+    }
+}
+
+// TODO: we'll probably need to do more of these per apple silicon one
+fn build_apple_silicon_h264_permutations(
+    engine: &mut PermutationEngine,
+    cli: &PermutorCli,
+    bitrate: u32,
+) {
+    // this can probably be simplified with a type
+    let h264 = cli.encoder.contains("h264");
+    let prores = cli.encoder.contains("prores");
+    let mut apple_silicon = Apple::new(h264, prores);
+
+    // initialize the permutations each time
+    apple_silicon.init();
+
+    while let Some((_encoder_index, settings)) = apple_silicon.next() {
         let mut permutation = Permutation::new(cli.source_file.clone(), cli.encoder.clone());
         permutation.video_file = cli.source_file.clone();
         permutation.encoder_settings = settings;
