@@ -1,0 +1,29 @@
+name: Windows Release Workflow
+
+on:
+  workflow_dispatch:
+    branches:
+      - main
+    inputs:
+      tag:
+        required: true
+        type: string
+      name:
+        required: true
+        type: string
+
+permissions:
+  # required for us to upload artifacts from the release
+  contents: write
+  pull-requests: read
+
+
+jobs:
+  windows-release:
+    uses: ./.github/workflows/release.yml
+    with:
+      # all other inputs will be done by hand
+      platform: ubuntu-22.04
+      artifacts: "target/release/benchmark,target/release/permutor-cli"
+      tag: ${{inputs.tag}}
+      name: ${{inputs.name}}
