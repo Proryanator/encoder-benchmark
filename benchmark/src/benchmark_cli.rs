@@ -37,6 +37,9 @@ pub struct BenchmarkCli {
     // this is an internal option not intended to be exposed to the end user
     #[arg(short, long, hide = true)]
     was_ui_opened: bool,
+    /// opt-out of using b frames for either H264 or HEVC encoders; currently only supported for Nvidia GPUs
+    #[arg(short, long)]
+    pub no_b_frame: bool,
 }
 
 impl BenchmarkCli {
@@ -57,6 +60,7 @@ impl BenchmarkCli {
             decode: false,
             ten_bit: false,
             was_ui_opened: false,
+            no_b_frame: false,
         };
     }
 

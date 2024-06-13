@@ -46,6 +46,9 @@ pub struct PermutorCli {
     /// the GPU you wish to run the encode on; defaults to the first/only GPU found in your system
     #[arg(short, long, default_value = "0")]
     pub gpu: u8,
+    /// opt-out of using b frames for either H264 or HEVC encoders; currently only supported for Nvidia GPUs
+    #[arg(short, long)]
+    pub no_b_frame: bool,
 }
 
 impl PermutorCli {

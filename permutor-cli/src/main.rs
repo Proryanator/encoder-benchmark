@@ -80,7 +80,7 @@ fn build_nvenc_setting_permutations(
     cli: &PermutorCli,
     bitrate: u32,
 ) {
-    let mut nvenc = Nvenc::new(cli.encoder == "hevc_nvenc", cli.gpu);
+    let mut nvenc = Nvenc::new(cli.encoder == "hevc_nvenc", cli.gpu, cli.no_b_frame);
 
     // initialize the permutations each time
     nvenc.init();

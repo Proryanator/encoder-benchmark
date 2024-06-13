@@ -10,6 +10,8 @@ pub struct Nvenc {
     tunes: Vec<&'static str>,
     profiles: Vec<&'static str>,
     rate_controls: Vec<&'static str>,
+    // allows for opting out of using b frames for GPUs that do not support it
+    no_b_frames: bool,
     // might be able to make this the size we're expecting
     permutations: Vec<String>,
     index: i32,
@@ -17,7 +19,7 @@ pub struct Nvenc {
 }
 
 impl Nvenc {
-    pub fn new(is_hevc: bool, gpu: u8) -> Self {
+    pub fn new(is_hevc: bool, gpu: u8, no_b_frames: bool) -> Self {
         Self {
             presets: get_nvenc_presets(),
             tunes: get_nvenc_tunes(),
@@ -25,6 +27,7 @@ impl Nvenc {
             profiles: if is_hevc { vec!["main"] } else { vec!["high"] },
             // leaving out vbr rate controls as these are not ideal for game streaming
             rate_controls: vec!["cbr"],
+            no_b_frames,
             permutations: Vec::new(),
             // starts at -1, so that first next() will return the first element
             index: -1,
@@ -59,6 +62,7 @@ struct NvencSettings {
     tune: &'static str,
     profile: &'static str,
     rate_control: &'static str,
+    no_b_frame: bool,
     gpu: u8,
 }
 
@@ -73,6 +77,11 @@ impl NvencSettings {
         args.push_str(self.profile);
         args.push_str(" -rc ");
         args.push_str(self.rate_control);
+        // user may have opted out of using b frames
+        if self.no_b_frame {
+            args.push_str(" -b_ref_mode 0");
+        }
+
         // always set this to constant bit rate to ensure reliable stream
         args.push_str(" -cbr true");
         args.push_str(" -gpu ");
@@ -129,6 +138,7 @@ impl Permute for Nvenc {
                 tune: unwrapped_perm.get(1).unwrap(),
                 profile: unwrapped_perm.get(2).unwrap(),
                 rate_control: unwrapped_perm.get(3).unwrap(),
+                no_b_frame: self.no_b_frames,
                 gpu: self.gpu,
             };
 
@@ -176,19 +186,19 @@ mod tests {
 
     #[test]
     fn create_h264_test() {
-        let nvenc = Nvenc::new(false, 0);
+        let nvenc = Nvenc::new(false, 0, false);
         assert!(nvenc.profiles.contains(&"high"));
     }
 
     #[test]
     fn create_hevc_test() {
-        let nvenc = Nvenc::new(true, 0);
+        let nvenc = Nvenc::new(true, 0, false);
         assert!(nvenc.profiles.contains(&"main"));
     }
 
     #[test]
     fn iterate_to_end_test() {
-        let mut nvenc = Nvenc::new(false, 0);
+        let mut nvenc = Nvenc::new(false, 0, false);
         let perm_count = nvenc.init().len();
 
         let mut total = 0;
@@ -202,15 +212,22 @@ mod tests {
 
     #[test]
     fn total_permutations_test() {
-        let mut nvenc = Nvenc::new(false, 0);
+        let mut nvenc = Nvenc::new(false, 0, false);
         assert_eq!(nvenc.init().len(), get_expected_len(&nvenc));
     }
 
     #[test]
     fn init_twice_not_double_test() {
-        let mut nvenc = Nvenc::new(false, 0);
+        let mut nvenc = Nvenc::new(false, 0, false);
         nvenc.init();
         assert_eq!(nvenc.init().len(), get_expected_len(&nvenc));
+    }
+
+    #[test]
+    fn no_b_frame_test() {
+        let mut nvenc = Nvenc::new(false, 0, true);
+        nvenc.init();
+        assert_eq!(nvenc.no_b_frames, true);
     }
 
     fn get_expected_len(nvenc: &Nvenc) -> usize {
